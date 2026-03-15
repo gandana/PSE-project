@@ -1,25 +1,32 @@
 #include <iostream>
 #include "MeetingPlanner.h"
 #include "SystemParser.h"
+#include "SystemOutput.h"
 
 int main() {
-    std::cout << "--- University of Antwerp Meeting Planner ---" << std::endl;
+    std::cout << "--- University of Antwerp Meeting Planner ---\n";
 
     MeetingPlanner planner;
     SystemParser parser;
 
-    // Making sure valid_planner.xml is inside an "input" folder in the project root!
-    std::string filename = "input/valid_planner.xml";
+    std::string filename = "input/proper_planner.xml";
+    std::string reportFile = "report.txt"; // Save next to our executable
 
     std::cout << "Attempting to load system from: " << filename << "...\n";
-
-    // This will parse the file and run the consistency checks
     parser.loadFile(filename, planner);
 
-    // If loadFile succeeds and the system is consistent, it reaches here
-    std::cout << "\nSuccess! System loaded properly." << std::endl;
-    std::cout << "Total Rooms loaded: " << planner.getRooms().size() << std::endl;
-    std::cout << "Total Meetings loaded: " << planner.getMeetings().size() << std::endl;
+    if (!planner.getRooms().empty()) {
+        std::cout << "\nSuccess! System loaded properly.\n";
+
+        //  Use Case 1.4: Auto-process all meetings
+        planner.processAllMeetings();
+
+        //  Use Case 1.2: Generate the Output Report
+        SystemOutput::generateReport(planner, reportFile);
+
+    } else {
+        std::cout << "\nFailed to load data. Please check the file path.\n";
+    }
 
     return 0;
 }

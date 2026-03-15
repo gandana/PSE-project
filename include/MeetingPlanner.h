@@ -48,7 +48,7 @@ public:
         meetings.push_back(meeting);
     }
 
-    // Link a user to an existing meeting
+    // Linking a user to an existing meeting
     bool addParticipation(const std::string& meetingId, const std::string& userName) {
         REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
         REQUIRE(!userName.empty(), "User name cannot be empty");
@@ -56,11 +56,63 @@ public:
         for (auto& m : meetings) {
             if (m.getIdentifier() == meetingId) {
                 m.addParticipant(userName);
-                return true; // Successfully added
+                return true;
             }
         }
         std::cerr << "Error: Cannot add participant. Meeting ID " << meetingId << " not found.\n";
-        return false; // Meeting not found
+        return false;
+    }
+
+    // Use Case 1.3: Process a single meeting
+    void processMeeting(const std::string& meetingId) {
+        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
+
+        Meeting* targetMeeting = nullptr;
+        // Find the meeting
+        for (auto& m : meetings) {
+            if (m.getIdentifier() == meetingId) {
+                targetMeeting = &m;
+                break;
+            }
+        }
+
+        if (!targetMeeting || targetMeeting->isProcessed() || targetMeeting->isCanceled()) {
+            return; // Meeting doesn't exist or is already handled
+        }
+
+        // Checking for conflicts
+        for (const auto& other : meetings) {
+            if (other.isProcessed() && !other.isCanceled() &&
+                other.getRoomId() == targetMeeting->getRoomId() &&
+                other.getDate() == targetMeeting->getDate()) {
+
+                // Exception triggered! Room is occupied.
+                std::cerr << "Error: Room " << targetMeeting->getRoomId()
+                          << " is already occupied on this date! Canceling meeting "
+                          << targetMeeting->getIdentifier() << ".\n";
+                targetMeeting->setCanceled(true);
+                return;
+            }
+        }
+
+        // Happy Day Scenario
+        targetMeeting->setProcessed(true);
+        std::cout << "Meeting " << targetMeeting->getIdentifier()
+                  << " (" << targetMeeting->getLabel() << ") successfully processed.\n";
+    }
+
+    // Automatically process all meetings
+    void processAllMeetings() {
+        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
+        std::cout << "\n--- Starting Automatic Processing ---\n";
+
+        for (auto& m : meetings) {
+            // Only process if it hasn't been handled yet
+            if (!m.isProcessed() && !m.isCanceled()) {
+                processMeeting(m.getIdentifier());
+            }
+        }
+        std::cout << "--- Processing Complete ---\n";
     }
 
     // Getters for the parser and output classes
