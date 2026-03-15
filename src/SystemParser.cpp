@@ -6,6 +6,9 @@
 SystemParser::SystemParser() : properlyInitialized(true) {
     ENSURE(isProperlyInitialized(), "SystemParser not initialized");
 }
+bool SystemParser::isProperlyInitialized() const {
+    return properlyInitialized;
+}
 
 void SystemParser::loadFile(const std::string& filename, MeetingPlanner& planner) {
     REQUIRE(isProperlyInitialized(), "SystemParser not properly initialized");

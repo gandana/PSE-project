@@ -29,7 +29,24 @@ public:
 
     void addRoom(const Room& room) { rooms.push_back(room); }
     void addMeeting(const Meeting& meeting) { meetings.push_back(meeting); }
+    /**
+         * @brief Koppelt een gebruiker aan een bestaande meeting.
+         * @param meetingId De ID van de meeting waar de gebruiker bij hoort.
+         * @param userName De naam van de deelnemer.
+         */
+    void addParticipation(const std::string& meetingId, const std::string& userName) {
+        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
 
+        // Zoek de juiste meeting op basis van de ID
+        for (auto& m : meetings) {
+            if (m.getIdentifier() == meetingId) {
+                m.addParticipant(userName); // Gebruikt de functie uit je Meeting.h
+                return;
+            }
+        }
+        // Als de meeting niet wordt gevonden
+        std::cerr << "Warning: Meeting " << meetingId << " not found for user " << userName << std::endl;
+    }
     const std::vector<Room>& getRooms() const { return rooms; }
     const std::vector<Meeting>& getMeetings() const { return meetings; }
 
