@@ -2,12 +2,18 @@
 #define MEETINGPLANNER_H
 
 #include <vector>
-#include <string>
 #include <iostream>
 #include "Room.h"
 #include "Meeting.h"
 #include "DesignByContract.h"
 
+/**
+ * @class MeetingPlanner
+ * @brief Beheert alle kamers en vergaderingen in het systeem.
+ * * Dit is de centrale klasse (het hart van het domein) die verantwoordelijk is
+ * voor het opslaan van de data en het verwerken van de simulatie om dubbele
+ * boekingen te voorkomen.
+ */
 class MeetingPlanner {
 private:
     std::vector<Room> rooms;
@@ -16,59 +22,29 @@ private:
 
 public:
     MeetingPlanner() : properlyInitialized(true) {
-        ENSURE(isProperlyInitialized(), "MeetingPlanner was not properly initialized");
+        ENSURE(isProperlyInitialized(), "MeetingPlanner not properly initialized");
     }
 
     bool isProperlyInitialized() const { return properlyInitialized; }
 
-    // Add a room to the system
-    void addRoom(const Room& room) {
-        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
-        // Simple check to prevent duplicate Room IDs
-        for (const auto& r : rooms) {
-            if (r.getIdentifier() == room.getIdentifier()) {
-                std::cerr << "Error: Room ID " << room.getIdentifier() << " already exists.\n";
-                return;
-            }
-        }
-        rooms.push_back(room);
-        ENSURE(rooms.back().getIdentifier() == room.getIdentifier(), "Room was not added properly");
-    }
+    void addRoom(const Room& room) { rooms.push_back(room); }
+    void addMeeting(const Meeting& meeting) { meetings.push_back(meeting); }
 
-    // Adding a meeting to the system
-    void addMeeting(const Meeting& meeting) {
-        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
-        // Check to prevent duplicate Meeting IDs
-        for (const auto& m : meetings) {
-            if (m.getIdentifier() == meeting.getIdentifier()) {
-                std::cerr << "Error: Meeting ID " << meeting.getIdentifier() << " already exists.\n";
-                return;
-            }
-        }
-        meetings.push_back(meeting);
-    }
+    const std::vector<Room>& getRooms() const { return rooms; }
+    const std::vector<Meeting>& getMeetings() const { return meetings; }
 
-    // Linking a user to an existing meeting
-    bool addParticipation(const std::string& meetingId, const std::string& userName) {
-        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
-        REQUIRE(!userName.empty(), "User name cannot be empty");
-
-        for (auto& m : meetings) {
-            if (m.getIdentifier() == meetingId) {
-                m.addParticipant(userName);
-                return true;
-            }
-        }
-        std::cerr << "Error: Cannot add participant. Meeting ID " << meetingId << " not found.\n";
-        return false;
-    }
-
-    // Use Case 1.3: Process a single meeting
+    /**
+     * @brief Verwerkt een specifieke vergadering en checkt op conflicten.
+     * * Zoekt de vergadering en controleert of de kamer op die datum al bezet is.
+     * Zo ja, dan wordt de vergadering geannuleerd. Zo nee, dan wordt deze verwerkt.
+     * @param meetingId De ID van de te verwerken vergadering.
+     * @pre De planner moet correct geïnitialiseerd zijn.
+     * @post De status van de meeting is 'processed' (succes) of 'canceled' (conflict).
+     */
     void processMeeting(const std::string& meetingId) {
         REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
 
         Meeting* targetMeeting = nullptr;
-        // Find the meeting
         for (auto& m : meetings) {
             if (m.getIdentifier() == meetingId) {
                 targetMeeting = &m;
@@ -77,16 +53,14 @@ public:
         }
 
         if (!targetMeeting || targetMeeting->isProcessed() || targetMeeting->isCanceled()) {
-            return; // Meeting doesn't exist or is already handled
+            return;
         }
 
-        // Checking for conflicts
         for (const auto& other : meetings) {
             if (other.isProcessed() && !other.isCanceled() &&
                 other.getRoomId() == targetMeeting->getRoomId() &&
                 other.getDate() == targetMeeting->getDate()) {
 
-                // Exception triggered! Room is occupied.
                 std::cerr << "Error: Room " << targetMeeting->getRoomId()
                           << " is already occupied on this date! Canceling meeting "
                           << targetMeeting->getIdentifier() << ".\n";
@@ -95,44 +69,25 @@ public:
             }
         }
 
-        // Happy Day Scenario
         targetMeeting->setProcessed(true);
         std::cout << "Meeting " << targetMeeting->getIdentifier()
                   << " (" << targetMeeting->getLabel() << ") successfully processed.\n";
     }
 
-    // Automatically process all meetings
+    /**
+     * @brief Doorloopt en verwerkt alle niet-verwerkte vergaderingen in het systeem.
+     * @pre De planner moet correct geïnitialiseerd zijn.
+     */
     void processAllMeetings() {
         REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
         std::cout << "\n--- Starting Automatic Processing ---\n";
 
         for (auto& m : meetings) {
-            // Only process if it hasn't been handled yet
             if (!m.isProcessed() && !m.isCanceled()) {
                 processMeeting(m.getIdentifier());
             }
         }
         std::cout << "--- Processing Complete ---\n";
-    }
-
-    // Getters for the parser and output classes
-    const std::vector<Room>& getRooms() const {
-        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
-        return rooms;
-    }
-
-    const std::vector<Meeting>& getMeetings() const {
-        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
-        return meetings;
-    }
-
-    // Checking if a room exists
-    bool roomExists(const std::string& roomId) const {
-        REQUIRE(isProperlyInitialized(), "MeetingPlanner not initialized");
-        for (const auto& r : rooms) {
-            if (r.getIdentifier() == roomId) return true;
-        }
-        return false;
     }
 };
 
