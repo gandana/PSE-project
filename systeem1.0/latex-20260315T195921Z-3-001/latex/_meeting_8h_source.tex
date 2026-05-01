@@ -1,0 +1,56 @@
+\doxysection{Meeting.\+h}
+\hypertarget{_meeting_8h_source}{}\label{_meeting_8h_source}\index{include/Meeting.h@{include/Meeting.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ MEETING\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ MEETING\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <chrono>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}DesignByContract.h"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{class_meeting_ace657e4028dc20a0e554b2ebb1e00b52}{Meeting}}\ \{}
+\DoxyCodeLine{00016\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00017\ \ \ \ \ std::string\ label;}
+\DoxyCodeLine{00018\ \ \ \ \ std::string\ identifier;}
+\DoxyCodeLine{00019\ \ \ \ \ std::string\ roomId;}
+\DoxyCodeLine{00020\ \ \ \ \ std::chrono::system\_clock::time\_point\ date;}
+\DoxyCodeLine{00021\ \ \ \ \ std::vector<std::string>\ participants;}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{bool}\ properlyInitialized;}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{bool}\ processed;}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{bool}\ canceled;}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00036\ \ \ \ \ \doxymbox{\hyperlink{class_meeting_ace657e4028dc20a0e554b2ebb1e00b52}{Meeting}}(\textcolor{keyword}{const}\ std::string\&\ lbl,\ \textcolor{keyword}{const}\ std::string\&\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ std::string\&\ rId,\ std::chrono::system\_clock::time\_point\ d)}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ :\ label(lbl),\ identifier(id),\ roomId(rId),\ date(d),\ properlyInitialized(true),\ processed(false),\ canceled(false)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ REQUIRE(!lbl.empty(),\ \textcolor{stringliteral}{"{}Label\ cannot\ be\ empty"{}});}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ REQUIRE(!\textcolor{keywordtype}{id}.empty(),\ \textcolor{stringliteral}{"{}Identifier\ cannot\ be\ empty"{}});}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ REQUIRE(!rId.empty(),\ \textcolor{stringliteral}{"{}Room\ ID\ cannot\ be\ empty"{}});}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ ENSURE(isProperlyInitialized(),\ \textcolor{stringliteral}{"{}Meeting\ was\ not\ properly\ initialized"{}});}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{bool}\ isProperlyInitialized()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ properlyInitialized;\ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{class_meeting_aee50e890d312afa8b7775ee4687598d1}{addParticipant}}(\textcolor{keyword}{const}\ std::string\&\ userName)\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ REQUIRE(isProperlyInitialized(),\ \textcolor{stringliteral}{"{}Meeting\ not\ initialized"{}});}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ REQUIRE(!userName.empty(),\ \textcolor{stringliteral}{"{}User\ name\ cannot\ be\ empty"{}});}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ participants.push\_back(userName);}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{void}\ setProcessed(\textcolor{keywordtype}{bool}\ status)\ \{\ processed\ =\ status;\ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{bool}\ isProcessed()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ processed;\ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{void}\ setCanceled(\textcolor{keywordtype}{bool}\ status)\ \{\ canceled\ =\ status;\ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{bool}\ isCanceled()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ canceled;\ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ getLabel()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ label;\ \}}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ getIdentifier()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ identifier;\ \}}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{const}\ std::string\&\ getRoomId()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ roomId;\ \}}
+\DoxyCodeLine{00066\ \ \ \ \ std::chrono::system\_clock::time\_point\ getDate()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ date;\ \}}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keyword}{const}\ std::vector<std::string>\&\ getParticipants()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ participants;\ \}}
+\DoxyCodeLine{00068\ \};}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ MEETING\_H}}
+
+\end{DoxyCode}

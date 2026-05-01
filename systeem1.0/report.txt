@@ -1,0 +1,24 @@
+--- System Report ---
+
+Meetings:
+Room_2, 22/05/2026
+Weekly Meeting
+Kasper Engelen, Serge Demeyer
+Meeting ID: Meeting_1
+Status: PROCESSED
+
+Room_1, 10/06/2026
+Project Presentation
+Denys
+Meeting ID: Meeting_2
+Status: PROCESSED
+
+Rooms:
+M.G.025
+Capacity: 55 people
+Room ID: Room_1
+
+M.G.023
+Capacity: 10 people
+Room ID: Room_2
+

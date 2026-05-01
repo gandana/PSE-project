@@ -1,0 +1,55 @@
+\doxysection{System\+Output Class Reference}
+\hypertarget{class_system_output}{}\label{class_system_output}\index{SystemOutput@{SystemOutput}}
+
+
+Zorgt voor het genereren van output rapporten.  
+
+
+
+
+{\ttfamily \+\#include $<$System\+Output.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \doxymbox{\hyperlink{class_system_output_a6d4427ff159954b5f8aa5385b4e106bb}{generate\+Report}} (const \doxymbox{\hyperlink{class_meeting_planner}{Meeting\+Planner}} \&planner, const std::\+string \&filename)
+\begin{DoxyCompactList}\small\item\em Genereert een tekstueel rapport van alle kamers en vergaderingen. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Zorgt voor het genereren van output rapporten. 
+
+
+\begin{DoxyItemize}
+\item Scheidt de output-\/logica (het schrijven naar tekstbestanden) van de kernlogica (de \doxylink{class_meeting_planner}{Meeting\+Planner}), wat zorgt voor een sterker object-\/georiënteerd design. 
+\end{DoxyItemize}
+
+\label{doc-func-members}
+\Hypertarget{class_system_output_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_system_output_a6d4427ff159954b5f8aa5385b4e106bb}\index{SystemOutput@{SystemOutput}!generateReport@{generateReport}}
+\index{generateReport@{generateReport}!SystemOutput@{SystemOutput}}
+\doxysubsubsection{\texorpdfstring{generateReport()}{generateReport()}}
+{\footnotesize\ttfamily \label{class_system_output_a6d4427ff159954b5f8aa5385b4e106bb} 
+void System\+Output::\+generate\+Report (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{class_meeting_planner}{Meeting\+Planner}} \&}]{planner}{, }\item[{const std::\+string \&}]{filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Genereert een tekstueel rapport van alle kamers en vergaderingen. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em planner} & De planner waarvan de data gelezen moet worden. \\
+\hline
+{\em filename} & De naam van het bestand waar het rapport in wordt opgeslagen (bijv. "{}report.\+txt"{}). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPostcond}{Postcondition}
+Een tekstbestand is aangemaakt op de harde schijf. 
+\end{DoxyPostcond}
+
+
+The documentation for this class was generated from the following files:\+\begin{DoxyCompactItemize}
+\item 
+include/\+System\+Output.\+h\item 
+src/\+System\+Output.\+cpp\end{DoxyCompactItemize}

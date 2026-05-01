@@ -1,0 +1,23 @@
+\doxysection{Design\+By\+Contract.\+h}
+\hypertarget{_design_by_contract_8h_source}{}\label{_design_by_contract_8h_source}\index{include/DesignByContract.h@{include/DesignByContract.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//============================================================================}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Name\ \ \ \ \ \ \ \ :\ DesignByContract.h}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Author\ \ \ \ \ \ :\ Serge\ Demeyer,\ modified\ by\ Kasper\ Engelen}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ Version\ \ \ \ \ :}}
+\DoxyCodeLine{00005\ \textcolor{comment}{//\ Copyright\ \ \ :\ Project\ Software\ Engineering\ -\/\ BA1\ Informatica\ -\/\ Serge\ Demeyer\ -\/\ University\ of\ Antwerp}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//\ Description\ :\ Declarations\ for\ design\ by\ contract\ in\ C++}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//============================================================================}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <cstdlib>}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{comment}{//\ We\ replaced\ the\ hidden\ \_\_assert\ with\ a\ standard\ C++\ crash\ (std::abort)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ REQUIRE(assertion,\ what)\ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{if\ (!(assertion))\ \{\ std::cerr\ <<\ "{}PRECONDITION\ FAILED:\ "{}\ <<\ what\ <<\ "{}\(\backslash\)n"{};\ std::abort();\ \}}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ ENSURE(assertion,\ what)\ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{if\ (!(assertion))\ \{\ std::cerr\ <<\ "{}POSTCONDITION\ FAILED:\ "{}\ <<\ what\ <<\ "{}\(\backslash\)n"{};\ std::abort();\ \}}}
+
+\end{DoxyCode}

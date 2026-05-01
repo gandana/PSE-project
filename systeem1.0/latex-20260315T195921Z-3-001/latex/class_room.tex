@@ -1,0 +1,92 @@
+\doxysection{Room Class Reference}
+\hypertarget{class_room}{}\label{class_room}\index{Room@{Room}}
+
+
+Vertegenwoordigt een fysieke kamer in het vergadersysteem.  
+
+
+
+
+{\ttfamily \+\#include $<$Room.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{class_room_ac3c9fef6420fc0191675c65309a6167e}{Room}} (const std::\+string \&n, const std::\+string \&id, int cap)
+\begin{DoxyCompactList}\small\item\em Constructor voor een \doxylink{class_room}{Room}. \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{class_room_a557ca15d90a81e38f693b10902e666ac}{is\+Properly\+Initialized}} () const
+\begin{DoxyCompactList}\small\item\em Controleert of het object correct is aangemaakt. \end{DoxyCompactList}\item 
+\Hypertarget{class_room_a73fdcdf0e58878e2e97b68b61b55c6cd}\label{class_room_a73fdcdf0e58878e2e97b68b61b55c6cd} 
+const std::\+string \& {\bfseries get\+Name} () const
+\item 
+\Hypertarget{class_room_ab52e9cddfef90f4e02ca00a009189a08}\label{class_room_ab52e9cddfef90f4e02ca00a009189a08} 
+const std::\+string \& {\bfseries get\+Identifier} () const
+\item 
+\Hypertarget{class_room_a97b134c160a98a37c45f787c16a120c1}\label{class_room_a97b134c160a98a37c45f787c16a120c1} 
+int {\bfseries get\+Capacity} () const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Vertegenwoordigt een fysieke kamer in het vergadersysteem. 
+
+
+\begin{DoxyItemize}
+\item Deze klasse bevat de basisgegevens van een kamer, zoals de naam, unieke identifier en de maximale capaciteit. 
+\end{DoxyItemize}
+
+\label{doc-constructors}
+\Hypertarget{class_room_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_room_ac3c9fef6420fc0191675c65309a6167e}\index{Room@{Room}!Room@{Room}}
+\index{Room@{Room}!Room@{Room}}
+\doxysubsubsection{\texorpdfstring{Room()}{Room()}}
+{\footnotesize\ttfamily \label{class_room_ac3c9fef6420fc0191675c65309a6167e} 
+Room::\+\+Room (\begin{DoxyParamCaption}\item[{const std::\+string \&}]{n}{, }\item[{const std::\+string \&}]{id}{, }\item[{int}]{cap}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Constructor voor een \doxylink{class_room}{Room}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n} & De weergavenaam van de kamer. \\
+\hline
+{\em id} & De unieke identifier van de kamer. \\
+\hline
+{\em cap} & De maximale capaciteit van de kamer (moet \texorpdfstring{$>$}{>} 0 zijn). \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+n mag niet leeg zijn. 
+
+id mag niet leeg zijn. 
+
+cap moet strikt groter dan 0 zijn. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+Het object is correct geïnitialiseerd. 
+\end{DoxyPostcond}
+
+
+\label{doc-func-members}
+\Hypertarget{class_room_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_room_a557ca15d90a81e38f693b10902e666ac}\index{Room@{Room}!isProperlyInitialized@{isProperlyInitialized}}
+\index{isProperlyInitialized@{isProperlyInitialized}!Room@{Room}}
+\doxysubsubsection{\texorpdfstring{isProperlyInitialized()}{isProperlyInitialized()}}
+{\footnotesize\ttfamily \label{class_room_a557ca15d90a81e38f693b10902e666ac} 
+bool Room::\+is\+Properly\+Initialized (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Controleert of het object correct is aangemaakt. 
+
+\begin{DoxyReturn}{Returns}
+true als de kamer correct is geïnitialiseerd, anders false. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+include/\+Room.\+h\end{DoxyCompactItemize}

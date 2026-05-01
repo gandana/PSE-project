@@ -1,0 +1,11 @@
+<SYSTEM>
+    <ROOM>
+        <NAME>Broom Closet</NAME>
+        <IDENTIFIER>Room_Bad</IDENTIFIER>
+        <CAPACITY>-5</CAPACITY> </ROOM>
+
+    <MEETING>
+        <LABEL>Ghost Meeting</LABEL>
+        <IDENTIFIER>Meeting_Bad</IDENTIFIER>
+        <ROOM>Room_Nowhere</ROOM> <DATE>2026-13-45</DATE> </MEETING>
+</SYSTEM>
