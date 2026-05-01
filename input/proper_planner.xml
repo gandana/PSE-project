@@ -1,0 +1,38 @@
+<SYSTEM>
+    <ROOM>
+        <NAME>M.G.025</NAME>
+        <IDENTIFIER>Room_1</IDENTIFIER>
+        <CAPACITY>55</CAPACITY>
+    </ROOM>
+    <ROOM>
+        <NAME>M.G.023</NAME>
+        <IDENTIFIER>Room_2</IDENTIFIER>
+        <CAPACITY>10</CAPACITY>
+    </ROOM>
+
+    <MEETING>
+        <LABEL>Weekly Meeting</LABEL>
+        <IDENTIFIER>Meeting_1</IDENTIFIER>
+        <ROOM>Room_2</ROOM>
+        <DATE>2026-05-22</DATE>
+    </MEETING>
+    <MEETING>
+        <LABEL>Project Presentation</LABEL>
+        <IDENTIFIER>Meeting_2</IDENTIFIER>
+        <ROOM>Room_1</ROOM>
+        <DATE>2026-06-10</DATE>
+    </MEETING>
+
+    <PARTICIPATION>
+        <MEETING>Meeting_1</MEETING>
+        <USER>Kasper Engelen</USER>
+    </PARTICIPATION>
+    <PARTICIPATION>
+        <MEETING>Meeting_1</MEETING>
+        <USER>Serge Demeyer</USER>
+    </PARTICIPATION>
+    <PARTICIPATION>
+        <MEETING>Meeting_2</MEETING>
+        <USER>Denys</USER>
+    </PARTICIPATION>
+</SYSTEM>
