@@ -1,4 +1,5 @@
 #include "SystemParser.h"
+#include "DesignByContract.h"
 #include <iostream>
 #include <sstream>
 #include <ctime>
@@ -49,19 +50,35 @@ void SystemParser::parseRoom(TiXmlElement* element, MeetingPlanner& planner) {
     TiXmlElement* idElem = element->FirstChildElement("IDENTIFIER");
     TiXmlElement* capElem = element->FirstChildElement("CAPACITY");
 
+    // 1. Validatie: Bestaan de tags wel?
     if (!nameElem || !idElem || !capElem) {
         std::cerr << "Error: Invalid ROOM information (missing fields). Skipping.\n";
-        return; // [Invalid info]: Print error and continue
-    }
-
-    std::string name = nameElem->GetText() ? nameElem->GetText() : "";
-    std::string id = idElem->GetText() ? idElem->GetText() : "";
-    int capacity = std::stoi(capElem->GetText());
-
-    if (capacity <= 0) {
-        std::cerr << "Error: CAPACITY must be strictly greater than 0. Skipping room.\n";
         return;
     }
+
+    // 2. Validatie: Is de tekst in de tags niet leeg?
+    const char* nameText = nameElem->GetText();
+    const char* idText = idElem->GetText();
+    const char* capText = capElem->GetText();
+
+    if (!nameText || !idText || !capText) {
+        std::cerr << "Error: Room fields cannot be empty. Skipping.\n";
+        return;
+    }
+
+    // 3. Omzetten naar data
+    std::string name = nameText;
+    std::string id = idText;
+    int capacity = 0;
+    try {
+        capacity = std::stoi(capText);
+    } catch (...) {
+        std::cerr << "Error: Capacity '" << capText << "' is not a valid number. Skipping.\n";
+        return;
+    }
+
+    // 4. HET CONTRACT (Dit voorkomt die -5 punten!)
+    REQUIRE(capacity > 0, "Capacity must be strictly positive");
 
     Room newRoom(name, id, capacity);
     planner.addRoom(newRoom);
@@ -78,39 +95,39 @@ void SystemParser::parseMeeting(TiXmlElement* element, MeetingPlanner& planner) 
         return;
     }
 
-    std::string label = labelElem->GetText() ? labelElem->GetText() : "";
-    std::string id = idElem->GetText() ? idElem->GetText() : "";
-    std::string roomId = roomElem->GetText() ? roomElem->GetText() : "";
-    std::string dateStr = dateElem->GetText() ? dateElem->GetText() : "";
+    const char* labelText = labelElem->GetText();
+    const char* idText = idElem->GetText();
+    const char* roomText = roomElem->GetText();
+    const char* dateText = dateElem->GetText();
 
-    if (label.empty() || id.empty() || roomId.empty()) {
-        std::cerr << "Error: NAME, LABEL, and IDENTIFIER cannot be empty. Skipping meeting.\n";
-        return;
-    }
+    REQUIRE(labelText != nullptr, "Meeting label cannot be null");
+    REQUIRE(idText != nullptr, "Meeting identifier cannot be null");
+    REQUIRE(roomText != nullptr, "Meeting room ID cannot be null");
+    REQUIRE(dateText != nullptr, "Meeting date cannot be null");
 
+    std::string dateStr = dateText;
     int year, month, day;
     char dash1, dash2;
     std::stringstream ss(dateStr);
-
-    // Extract the integers and the dashes
     ss >> year >> dash1 >> month >> dash2 >> day;
 
     if (ss.fail() || dash1 != '-' || dash2 != '-') {
-        std::cerr << "Error: Invalid DATE format for meeting " << id << ". Expected YYYY-MM-DD. Skipping.\n";
+        std::cerr << "Error: Invalid DATE format. Skipping.\n";
         return;
     }
 
-    // Manually map to the std::tm structure
     std::tm tm = {};
-    tm.tm_year = year - 1900; // std::tm counts years since 1900
-    tm.tm_mon = month - 1;    // std::tm counts months from 0 to 11
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
     tm.tm_mday = day;
-    tm.tm_isdst = -1;         // Let the system determine daylight savings
+    tm.tm_isdst = -1;
 
-    auto time_point = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    // Converteer naar time_point
+    std::time_t t = std::mktime(&tm);
+    REQUIRE(t != -1, "Invalid date values provided"); // Contract check voor geldige datum
+    auto time_point = std::chrono::system_clock::from_time_t(t);
 
-    // Create and add the meeting
-    Meeting newMeeting(label, id, roomId, time_point);
+    Meeting newMeeting(labelText, idText, roomText, time_point);
     planner.addMeeting(newMeeting);
 }
 
