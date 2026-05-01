@@ -6,45 +6,33 @@
 
 /**
  * @class Room
- * @brief Vertegenwoordigt een fysieke kamer in het vergadersysteem.
- * * Deze klasse bevat de basisgegevens van een kamer, zoals de naam,
- * unieke identifier en de maximale capaciteit.
+ * @brief Representeert een kamer op de campus met een specifieke capaciteit.
  */
 class Room {
 private:
-    std::string name;
-    std::string identifier;
-    int capacity;
-    bool properlyInitialized;
+    std::string fName;
+    std::string fIdentifier;
+    int fCapacity;
+    bool fProperlyInitialized;
 
 public:
     /**
-     * @brief Constructor voor een Room.
-     * @param n De weergavenaam van de kamer.
+     * @brief Constructor voor een Room object.
+     * @param name De menselijk leesbare naam van de kamer.
      * @param id De unieke identifier van de kamer.
-     * @param cap De maximale capaciteit van de kamer (moet > 0 zijn).
-     * @pre n mag niet leeg zijn.
-     * @pre id mag niet leeg zijn.
-     * @pre cap moet strikt groter dan 0 zijn.
-     * @post Het object is correct geïnitialiseerd.
+     * @param capacity Het aantal mensen dat in de kamer past (moet > 0 zijn).
      */
-    Room(const std::string& n, const std::string& id, int cap)
-        : name(n), identifier(id), capacity(cap), properlyInitialized(true) {
-        REQUIRE(!n.empty(), "Name cannot be empty");
-        REQUIRE(!id.empty(), "Identifier cannot be empty");
-        REQUIRE(cap > 0, "Capacity must be strictly greater than 0");
-        ENSURE(isProperlyInitialized(), "Room was not properly initialized");
-    }
+    Room(const std::string& name, const std::string& id, int capacity);
 
     /**
-     * @brief Controleert of het object correct is aangemaakt.
-     * @return true als de kamer correct is geïnitialiseerd, anders false.
+     * @brief Controleert of het object correct is geïnitialiseerd.
      */
-    bool isProperlyInitialized() const { return properlyInitialized; }
+    bool isProperlyInitialized() const;
 
-    const std::string& getName() const { return name; }
-    const std::string& getIdentifier() const { return identifier; }
-    int getCapacity() const { return capacity; }
+    // --- Getters ---
+    const std::string& getName() const;
+    const std::string& getIdentifier() const;
+    int getCapacity() const;
 };
 
 #endif // ROOM_H

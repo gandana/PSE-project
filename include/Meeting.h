@@ -6,6 +6,10 @@
 #include <vector>
 #include "DesignByContract.h"
 
+/**
+ * @class Meeting
+ * @brief Representatie van een vergadering in het systeem.
+ */
 class Meeting {
 private:
     std::string fLabel;
@@ -20,83 +24,38 @@ private:
 public:
     /**
      * @brief Constructor voor een Meeting object.
-     * REQUIRE(!lbl.empty(), "Label mag niet leeg zijn");
-     * REQUIRE(!id.empty(), "Identifier mag niet leeg zijn");
-     * REQUIRE(!rId.empty(), "Room ID mag niet leeg zijn");
-     * ENSURE(isProperlyInitialized(), "Meeting moet correct geïnitialiseerd zijn");
      */
-    Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d)
-        : fLabel(lbl), fIdentifier(id), fRoomId(rId), fDate(d), fProperlyInitialized(true), fProcessed(false), fCanceled(false) {
-        REQUIRE(!lbl.empty(), "Label cannot be empty");
-        REQUIRE(!id.empty(), "Identifier cannot be empty");
-        REQUIRE(!rId.empty(), "Room ID cannot be empty");
-        ENSURE(isProperlyInitialized(), "Meeting was not properly initialized");
-    }
+    Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d);
 
-    bool isProperlyInitialized() const {
-        return fProperlyInitialized;
-    }
+    /**
+     * @brief Controleert of het object correct is geïnitialiseerd.
+     */
+    bool isProperlyInitialized() const;
 
     // --- GETTERS ---
-
-    const std::string& getLabel() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fLabel;
-    }
-
-    const std::string& getIdentifier() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fIdentifier;
-    }
-
-    const std::string& getRoomId() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fRoomId;
-    }
-
-    std::chrono::system_clock::time_point getDate() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fDate;
-    }
-
-    const std::vector<std::string>& getParticipants() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fParticipants;
-    }
-
-    bool isProcessed() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fProcessed;
-    }
-
-    bool isCanceled() const {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        return fCanceled;
-    }
+    const std::string& getLabel() const;
+    const std::string& getIdentifier() const;
+    const std::string& getRoomId() const;
+    std::chrono::system_clock::time_point getDate() const;
+    const std::vector<std::string>& getParticipants() const;
+    bool isProcessed() const;
+    bool isCanceled() const;
 
     // --- SETTERS & ACTIONS ---
+    /**
+     * @brief Voegt een deelnemer toe aan de meeting.
+     */
+    void addParticipant(const std::string& userName);
 
-    void addParticipant(const std::string& userName) {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        REQUIRE(!userName.empty(), "User name cannot be empty");
-        unsigned int oldSize = fParticipants.size();
+    /**
+     * @brief Zet de verwerkingsstatus van de meeting.
+     */
+    void setProcessed(bool status);
 
-        fParticipants.push_back(userName);
-
-        ENSURE(fParticipants.size() == oldSize + 1, "Participant was not added correctly");
-    }
-
-    void setProcessed(bool status) {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        fProcessed = status;
-        ENSURE(isProcessed() == status, "Processed status not set correctly");
-    }
-
-    void setCanceled(bool status) {
-        REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-        fCanceled = status;
-        ENSURE(isCanceled() == status, "Canceled status not set correctly");
-    }
+    /**
+     * @brief Zet de geannuleerde status van de meeting.
+     */
+    void setCanceled(bool status);
 };
 
 #endif // INC_MEETING_H

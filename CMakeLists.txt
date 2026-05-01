@@ -19,7 +19,9 @@ set(CORE_SOURCES
 
 # 2. Het echte programma: main + core
 add_executable(MeetingPlanner src/main.cpp ${CORE_SOURCES}
-        src/Room.cpp)
+        src/Room.cpp
+        src/Meeting.cpp
+        src/MeetingPlanner.cpp)
 
 # --- Google Test setup ---
 include(FetchContent)
