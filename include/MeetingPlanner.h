@@ -39,7 +39,6 @@ public:
     void runSimulation();
     // De getter voor Rooms (nodig voor de if-check in main)
     const std::vector<Room*>& getRooms() const { return fRooms; }
-    const std::vector<Room*>& getRooms() const { return fRooms; }
     const std::vector<Meeting*>& getMeetings() const { return fMeetings; }
     // De functie die je main aanroept
     void processAllMeetings();
