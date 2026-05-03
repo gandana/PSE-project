@@ -27,6 +27,10 @@ private:
 
 public:
     /**
+     * @brief Geeft de datum terug als een leesbare string (YYYY-MM-DD).
+     */
+    std::string getDateString() const;
+    /**
      * @brief Constructor voor een Meeting object.
      */
     Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d);

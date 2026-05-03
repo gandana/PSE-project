@@ -113,3 +113,13 @@ int Meeting::getParticipantCount() const {
     REQUIRE(isProperlyInitialized(), "Meeting niet geïnitialiseerd");
     return (int)fParticipants.size();
 }
+std::string Meeting::getDateString() const {
+    REQUIRE(isProperlyInitialized(), "Meeting niet geïnitialiseerd");
+
+    std::time_t t = std::chrono::system_clock::to_time_t(fDate);
+    std::tm* tm_ptr = std::localtime(&t);
+
+    char buffer[11];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d", tm_ptr);
+    return std::string(buffer);
+}

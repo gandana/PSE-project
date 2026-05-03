@@ -119,7 +119,7 @@ void MeetingPlanner::exportSystem(const std::string& filename) const {
 
         // Zorg dat je een getDateString() of iets dergelijks in je Meeting klasse hebt
         TiXmlElement* date = new TiXmlElement("DATE");
-        // date->LinkEndChild(new TiXmlText(m->getDateString().c_str()));
+        date->LinkEndChild(new TiXmlText(m->getDateString().c_str()));
 
         mElem->LinkEndChild(label);
         mElem->LinkEndChild(id);
@@ -182,6 +182,8 @@ void MeetingPlanner::runSimulation() {
     processAllMeetings();
 
     double totaalCO2 = 0.0;
+    int totaalDeelnemers = 0;
+    int aantalMeetings = 0;
 
     for (Meeting* m : fMeetings) {
         if (m->isCanceled()) {
@@ -191,16 +193,27 @@ void MeetingPlanner::runSimulation() {
             double meetingCO2 = m->calculateCO2();
             totaalCO2 += meetingCO2;
 
+            // VOEG DEZE TWEE REGELS TOE:
+            totaalDeelnemers += m->getParticipantCount(); // Voor punt 3.10
+            aantalMeetings++;                             // Voor punt 3.10
+
             std::cout << "[OK] " << m->getLabel()
                       << " | Deelnemers: " << m->getParticipantCount()
                       << " | CO2: " << meetingCO2 << "g" << std::endl;
         }
     }
+    // Statistieken (Punt 3.10)
+    std::cout << "Gemiddeld aantal deelnemers per meeting: "
+              << (aantalMeetings > 0 ? (double)totaalDeelnemers / aantalMeetings : 0) << std::endl;
 
-    std::cout << "\n-----------------------" << std::endl;
-    std::cout << "Totale CO2-uitstoot: " << totaalCO2 << "g" << std::endl;
-    std::cout << "--- EINDE SIMULATIE ---\n" << std::endl;
+    // Catering check (Punt 1.4)
+    std::cout << "\nCatering Overzicht:" << std::endl;
+    for (Catering* cat : fCaterings) {
+        std::cout << "- Provider " << cat->getProviderName()
+                  << " bedient gebouw " << cat->getBuildingId() << std::endl;
+    }
 }
+
 
 void MeetingPlanner::processAllMeetings() {
     REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
@@ -230,6 +243,8 @@ void MeetingPlanner::processAllMeetings() {
 
         // --- CHECK 1: CAPACITEIT ---
         if (m->getParticipants().size() > (size_t)targetRoom->getCapacity()) {
+            std::cout << "[CAPACITEIT FOUT] Meeting " << m->getLabel()
+                      << " past niet in " << targetRoom->getName() << std::endl; // Punt 3.6
             m->setCanceled(true);
         }
 
