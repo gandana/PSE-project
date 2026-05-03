@@ -12,6 +12,8 @@ MeetingPlanner::~MeetingPlanner() {
     for (Building* b : fBuildings) delete b;
     for (Room* r : fRooms) delete r;
     for (Meeting* m : fMeetings) delete m;
+    for (Renovation* ren : fRenovations) delete ren;
+    for (Catering* cat : fCaterings) delete cat;
 }
 
 void MeetingPlanner::addCampus(Campus* c) {
@@ -103,8 +105,72 @@ void MeetingPlanner::exportSystem(const std::string& filename) const {
         root->LinkEndChild(rElem);
     }
 
-    // 4. Meetings, 5. Renovations, 6. Catering...
-    // (Gebruik de lussen die ik je in het vorige bericht gaf)
+    // 4. Meetings
+    for (Meeting* m : fMeetings) {
+        TiXmlElement* mElem = new TiXmlElement("MEETING");
+        TiXmlElement* label = new TiXmlElement("LABEL");
+        label->LinkEndChild(new TiXmlText(m->getLabel().c_str()));
+        TiXmlElement* id = new TiXmlElement("IDENTIFIER");
+        id->LinkEndChild(new TiXmlText(m->getIdentifier().c_str()));
+        TiXmlElement* room = new TiXmlElement("ROOM");
+        room->LinkEndChild(new TiXmlText(m->getRoomId().c_str()));
+
+        // Zorg dat je een getDateString() of iets dergelijks in je Meeting klasse hebt
+        TiXmlElement* date = new TiXmlElement("DATE");
+        // date->LinkEndChild(new TiXmlText(m->getDateString().c_str()));
+
+        mElem->LinkEndChild(label);
+        mElem->LinkEndChild(id);
+        mElem->LinkEndChild(room);
+        mElem->LinkEndChild(date);
+        root->LinkEndChild(mElem);
+    }
+
+    // 5. Renovations
+    for (Renovation* ren : fRenovations) {
+        TiXmlElement* renElem = new TiXmlElement("RENOVATION");
+        TiXmlElement* room = new TiXmlElement("ROOM");
+        room->LinkEndChild(new TiXmlText(ren->getRoomId().c_str()));
+        TiXmlElement* start = new TiXmlElement("START");
+        start->LinkEndChild(new TiXmlText(std::to_string(ren->getStartDay()).c_str()));
+        TiXmlElement* end = new TiXmlElement("END");
+        end->LinkEndChild(new TiXmlText(std::to_string(ren->getEndDay()).c_str()));
+
+        renElem->LinkEndChild(room);
+        renElem->LinkEndChild(start);
+        renElem->LinkEndChild(end);
+        root->LinkEndChild(renElem);
+    }
+
+    // 6. Catering
+    for (Catering* cat : fCaterings) {
+        TiXmlElement* catElem = new TiXmlElement("CATERING");
+        TiXmlElement* prov = new TiXmlElement("PROVIDER");
+        prov->LinkEndChild(new TiXmlText(cat->getProviderName().c_str()));
+        TiXmlElement* build = new TiXmlElement("BUILDING");
+        build->LinkEndChild(new TiXmlText(cat->getBuildingId().c_str()));
+
+        catElem->LinkEndChild(prov);
+        catElem->LinkEndChild(build);
+        root->LinkEndChild(catElem);
+    }
 
     doc.SaveFile(filename.c_str());
+}
+
+void MeetingPlanner::addParticipation(const std::string& meetingId, const std::string& userId) {
+    REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
+
+    // We lopen door al onze meetings heen om de juiste te vinden
+    for (Meeting* m : fMeetings) {
+        // Is dit de meeting die in de XML wordt genoemd?
+        if (m->getIdentifier() == meetingId) {
+            // Ja! Voeg de user toe aan de lijst van deze specifieke meeting
+            m->addParticipant(userId);
+            return; // We zijn klaar, we kunnen stoppen met zoeken
+        }
+    }
+
+    // Als we hier komen, bestond de meetingId niet in onze lijst
+    std::cerr << "Fout: Kan deelnemer " << userId << " niet toevoegen aan onbekende meeting " << meetingId << std::endl;
 }
