@@ -43,7 +43,12 @@ void SystemParser::loadFile(const std::string& filename, MeetingPlanner& planner
             parseMeeting(elem, planner);
         } else if (elemName == "PARTICIPATION" || elemName == "participation") {
             parseParticipation(elem, planner);
+        } else if (elemName == "RENOVATION" || elemName == "renovation") {
+            parseRenovation(elem, planner);
+        } else if (elemName == "CATERING" || elemName == "catering") {
+            parseCatering(elem, planner);
         }
+
     }
 } // <--- Zorg dat dit sluitingshaakje er staat!
 

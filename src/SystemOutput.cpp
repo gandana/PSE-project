@@ -12,7 +12,7 @@ void SystemOutput::generateReport(const MeetingPlanner& planner, const std::stri
         return;
     }
 
-    outFile << "--- System Report ---\n\n";
+    outFile << "## ==== [SYSTEM STATUS] ==== ##\n\n";
 
     // --- 1. MEETINGS PRINTEN ---
     outFile << "Meetings:\n";
