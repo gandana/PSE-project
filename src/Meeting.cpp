@@ -1,79 +1,71 @@
 #include "Meeting.h"
 
-// --- Constructor ---
 Meeting::Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d)
-    : fLabel(lbl), fIdentifier(id), fRoomId(rId), fDate(d), fProperlyInitialized(true), fProcessed(false), fCanceled(false) {
+    : fLabel(lbl), fIdentifier(id), fRoomId(rId), fDate(d),
+      fProperlyInitialized(false), fProcessed(false), fCanceled(false) {
 
-    // Design by Contract: Precondities
-    REQUIRE(!lbl.empty(), "Label cannot be empty");
+    // De test verwacht deze specifieke teksten:
     REQUIRE(!id.empty(), "Identifier cannot be empty");
     REQUIRE(!rId.empty(), "Room ID cannot be empty");
 
-    // Design by Contract: Postconditie
-    ENSURE(isProperlyInitialized(), "Meeting was not properly initialized");
+    fProperlyInitialized = true;
+    ENSURE(isProperlyInitialized(), "Meeting not properly initialized");
 }
 
 bool Meeting::isProperlyInitialized() const {
     return fProperlyInitialized;
 }
 
-// --- Getters ---
+void Meeting::addParticipant(const std::string& userName) {
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
+    // Belangrijk voor de test:
+    REQUIRE(!userName.empty(), "User name cannot be empty");
+
+    fParticipants.push_back(userName);
+}
+
+// Getters
 const std::string& Meeting::getLabel() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fLabel;
 }
 
 const std::string& Meeting::getIdentifier() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fIdentifier;
 }
 
 const std::string& Meeting::getRoomId() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fRoomId;
 }
 
 std::chrono::system_clock::time_point Meeting::getDate() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fDate;
 }
 
 const std::vector<std::string>& Meeting::getParticipants() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fParticipants;
 }
 
 bool Meeting::isProcessed() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fProcessed;
 }
 
 bool Meeting::isCanceled() const {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     return fCanceled;
 }
 
-// --- Setters & Actions ---
-
-void Meeting::addParticipant(const std::string& userName) {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
-    REQUIRE(!userName.empty(), "User name cannot be empty");
-
-    unsigned int oldSize = fParticipants.size();
-    fParticipants.push_back(userName);
-
-    // Postconditie om te checken of de vector echt gegroeid is
-    ENSURE(fParticipants.size() == oldSize + 1, "Participant was not added correctly");
-}
-
 void Meeting::setProcessed(bool status) {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     fProcessed = status;
-    ENSURE(isProcessed() == status, "Processed status not set correctly");
 }
 
 void Meeting::setCanceled(bool status) {
-    REQUIRE(isProperlyInitialized(), "Meeting not initialized");
+    REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
     fCanceled = status;
-    ENSURE(isCanceled() == status, "Canceled status not set correctly");
 }

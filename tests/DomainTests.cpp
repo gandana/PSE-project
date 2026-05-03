@@ -6,7 +6,8 @@
 // --- ROOM TESTS ---
 
 TEST(RoomTest, ValidRoomCreation) {
-    Room r("M.G.025", "Room_1", 55);
+    // Toegevoegd: "Campus_1" en "Building_1" (nu 5 argumenten)
+    Room r("M.G.025", "Room_1", 55, "Campus_1", "Building_1");
     EXPECT_EQ(r.getName(), "M.G.025");
     EXPECT_EQ(r.getIdentifier(), "Room_1");
     EXPECT_EQ(r.getCapacity(), 55);
@@ -14,15 +15,17 @@ TEST(RoomTest, ValidRoomCreation) {
 }
 
 TEST(RoomTest, InvalidCapacityTriggersContract) {
-    EXPECT_DEATH(Room("BadRoom", "Room_Bad", 0), "Capacity must be strictly greater than 0");
+    // Toegevoegd: "C" en "B" achteraan
+    EXPECT_DEATH(Room("BadRoom", "Room_Bad", 0, "C", "B"), "Capacity must be strictly greater than 0");
 }
 
 TEST(RoomTest, EmptyNameTriggersContract) {
-    EXPECT_DEATH(Room("", "Room_Bad", 10), "Name cannot be empty");
+    // Toegevoegd: "C" en "B" achteraan
+    EXPECT_DEATH(Room("", "Room_Bad", 10, "C", "B"), "Name cannot be empty");
 }
 
 // --- MEETING TESTS ---
-// Ik heb de naam veranderd naar MeetingDomainTest om conflicten met TEST_F in andere bestanden te voorkomen
+// (Deze blijven hetzelfde omdat de Meeting constructor nog steeds 4 argumenten heeft)
 
 TEST(MeetingDomainTest, ValidMeetingCreation) {
     auto now = std::chrono::system_clock::now();
