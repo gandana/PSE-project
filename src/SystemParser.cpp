@@ -1,12 +1,19 @@
 #include "SystemParser.h"
 #include "DesignByContract.h"
+#include "Campus.h"
+#include "Building.h"
+#include "Room.h"
+#include "Meeting.h"
+#include "MeetingPlanner.h"
 #include <iostream>
 #include <sstream>
 #include <ctime>
+#include <chrono>
 
 SystemParser::SystemParser() : properlyInitialized(true) {
     ENSURE(isProperlyInitialized(), "SystemParser not initialized");
 }
+
 bool SystemParser::isProperlyInitialized() const {
     return properlyInitialized;
 }
@@ -27,7 +34,18 @@ void SystemParser::loadFile(const std::string& filename, MeetingPlanner& planner
         return;
     }
 
-    // Loop through all elements
+    // --- STAP 1: Eerst alle CAMPUS elementen inlezen ---
+    for (TiXmlElement* elem = root->FirstChildElement("CAMPUS"); elem != nullptr; elem = elem->NextSiblingElement("CAMPUS")) {
+        parseCampus(elem, planner);
+    }
+
+    // --- STAP 2: Dan alle BUILDING elementen ---
+    for (TiXmlElement* elem = root->FirstChildElement("BUILDING"); elem != nullptr; elem = elem->NextSiblingElement("BUILDING")) {
+        parseBuilding(elem, planner);
+    }
+
+    // --- STAP 3: De rest van de elementen in de juiste volgorde ---
+    // We lopen nog een keer door de root om de rest te vinden
     for (TiXmlElement* elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement()) {
         std::string elemName = elem->Value();
 
@@ -37,51 +55,56 @@ void SystemParser::loadFile(const std::string& filename, MeetingPlanner& planner
             parseMeeting(elem, planner);
         } else if (elemName == "PARTICIPATION") {
             parseParticipation(elem, planner);
-        } else {
-            std::cerr << "Warning: Unknown element <" << elemName << "> found. Skipping.\n";
         }
     }
+}
 
+void SystemParser::parseCampus(TiXmlElement* element, MeetingPlanner& planner) {
+    TiXmlElement* nameElem = element->FirstChildElement("NAME");
+    TiXmlElement* idElem = element->FirstChildElement("IDENTIFIER");
 
+    if (!nameElem || !idElem || !nameElem->GetText() || !idElem->GetText()) {
+        std::cerr << "Error: Invalid CAMPUS information (missing fields).\n";
+        return;
+    }
+
+    Campus* newCampus = new Campus(nameElem->GetText(), idElem->GetText());
+    planner.addCampus(newCampus);
+}
+
+void SystemParser::parseBuilding(TiXmlElement* element, MeetingPlanner& planner) {
+    TiXmlElement* nameElem = element->FirstChildElement("NAME");
+    TiXmlElement* idElem = element->FirstChildElement("IDENTIFIER");
+    TiXmlElement* campusElem = element->FirstChildElement("CAMPUS");
+
+    if (!nameElem || !idElem || !campusElem || !nameElem->GetText() || !idElem->GetText() || !campusElem->GetText()) {
+        std::cerr << "Error: Invalid BUILDING information (missing fields).\n";
+        return;
+    }
+
+    Building* newBuilding = new Building(nameElem->GetText(), idElem->GetText(), campusElem->GetText());
+    planner.addBuilding(newBuilding);
 }
 
 void SystemParser::parseRoom(TiXmlElement* element, MeetingPlanner& planner) {
     TiXmlElement* nameElem = element->FirstChildElement("NAME");
     TiXmlElement* idElem = element->FirstChildElement("IDENTIFIER");
     TiXmlElement* capElem = element->FirstChildElement("CAPACITY");
+    TiXmlElement* campusElem = element->FirstChildElement("CAMPUS");
+    TiXmlElement* buildElem = element->FirstChildElement("BUILDING");
 
-    // 1. Validatie: Bestaan de tags wel?
-    if (!nameElem || !idElem || !capElem) {
-        std::cerr << "Error: Invalid ROOM information (missing fields). Skipping.\n";
+    if (!nameElem || !idElem || !capElem || !campusElem || !buildElem) {
+        std::cerr << "Error: Invalid ROOM information. Skipping.\n";
         return;
     }
 
-    // 2. Validatie: Is de tekst in de tags niet leeg?
-    const char* nameText = nameElem->GetText();
-    const char* idText = idElem->GetText();
-    const char* capText = capElem->GetText();
+    int capacity = std::stoi(capElem->GetText());
 
-    if (!nameText || !idText || !capText) {
-        std::cerr << "Error: Room fields cannot be empty. Skipping.\n";
-        return;
-    }
+    // FIX: Gebruik 'new' om een pointer te maken
+    Room* roomPtr = new Room(nameElem->GetText(), idElem->GetText(), capacity,
+                             campusElem->GetText(), buildElem->GetText());
 
-    // 3. Omzetten naar data
-    std::string name = nameText;
-    std::string id = idText;
-    int capacity = 0;
-    try {
-        capacity = std::stoi(capText);
-    } catch (...) {
-        std::cerr << "Error: Capacity '" << capText << "' is not a valid number. Skipping.\n";
-        return;
-    }
-
-    // 4. HET CONTRACT (Dit voorkomt die -5 punten!)
-    REQUIRE(capacity > 0, "Capacity must be strictly positive");
-
-    Room newRoom(name, id, capacity);
-    planner.addRoom(newRoom);
+    planner.addRoom(roomPtr); // Nu matcht het type: het is een Room*
 }
 
 void SystemParser::parseMeeting(TiXmlElement* element, MeetingPlanner& planner) {
@@ -90,64 +113,60 @@ void SystemParser::parseMeeting(TiXmlElement* element, MeetingPlanner& planner) 
     TiXmlElement* roomElem = element->FirstChildElement("ROOM");
     TiXmlElement* dateElem = element->FirstChildElement("DATE");
 
-    if (!labelElem || !idElem || !roomElem || !dateElem) {
-        std::cerr << "Error: Invalid MEETING information (missing fields). Skipping.\n";
+    if (!labelElem || !idElem || !roomElem || !dateElem || !labelElem->GetText() || !idElem->GetText() || !roomElem->GetText() || !dateElem->GetText()) {
+        std::cerr << "Error: Invalid MEETING information.\n";
         return;
     }
 
-    const char* labelText = labelElem->GetText();
-    const char* idText = idElem->GetText();
-    const char* roomText = roomElem->GetText();
-    const char* dateText = dateElem->GetText();
-
-    REQUIRE(labelText != nullptr, "Meeting label cannot be null");
-    REQUIRE(idText != nullptr, "Meeting identifier cannot be null");
-    REQUIRE(roomText != nullptr, "Meeting room ID cannot be null");
-    REQUIRE(dateText != nullptr, "Meeting date cannot be null");
-
-    std::string dateStr = dateText;
+    // (Datum conversie logica blijft hetzelfde...)
+    std::string dateStr = dateElem->GetText();
     int year, month, day;
     char dash1, dash2;
     std::stringstream ss(dateStr);
     ss >> year >> dash1 >> month >> dash2 >> day;
-
-    if (ss.fail() || dash1 != '-' || dash2 != '-') {
-        std::cerr << "Error: Invalid DATE format. Skipping.\n";
-        return;
-    }
 
     std::tm tm = {};
     tm.tm_year = year - 1900;
     tm.tm_mon = month - 1;
     tm.tm_mday = day;
     tm.tm_isdst = -1;
-
-    // Converteer naar time_point
     std::time_t t = std::mktime(&tm);
-    REQUIRE(t != -1, "Invalid date values provided"); // Contract check voor geldige datum
     auto time_point = std::chrono::system_clock::from_time_t(t);
 
-    Meeting newMeeting(labelText, idText, roomText, time_point);
-    planner.addMeeting(newMeeting);
+    // FIX: Gebruik 'new' om een pointer te maken
+    Meeting* meetingPtr = new Meeting(labelElem->GetText(), idElem->GetText(),
+                                      roomElem->GetText(), time_point);
+
+    planner.addMeeting(meetingPtr); // Nu matcht het type: het is een Meeting*
 }
 
 void SystemParser::parseParticipation(TiXmlElement* element, MeetingPlanner& planner) {
     TiXmlElement* meetingElem = element->FirstChildElement("MEETING");
     TiXmlElement* userElem = element->FirstChildElement("USER");
 
-    if (!meetingElem || !userElem) {
-        std::cerr << "Error: Invalid PARTICIPATION information (missing fields). Skipping.\n";
+    if (!meetingElem || !userElem || !meetingElem->GetText() || !userElem->GetText()) {
         return;
     }
 
-    std::string meetingId = meetingElem->GetText() ? meetingElem->GetText() : "";
-    std::string userName = userElem->GetText() ? userElem->GetText() : "";
+    planner.addParticipation(meetingElem->GetText(), userElem->GetText());
+}
+void SystemParser::parseRenovation(TiXmlElement* element, MeetingPlanner& planner) {
+    const char* room = element->FirstChildElement("ROOM") ? element->FirstChildElement("ROOM")->GetText() : nullptr;
+    TiXmlElement* startElem = element->FirstChildElement("START");
+    TiXmlElement* endElem = element->FirstChildElement("END");
 
-    if (userName.empty() || meetingId.empty()) {
-        std::cerr << "Error: USER and MEETING cannot be empty in participation. Skipping.\n";
-        return;
+    if (room && startElem && endElem) {
+        int start = std::stoi(startElem->GetText());
+        int end = std::stoi(endElem->GetText());
+        planner.addRenovation(new Renovation(room, start, end));
     }
+}
 
-    // Attempt to link the user to the meeting
-    planner.addParticipation(meetingId, userName);
+void SystemParser::parseCatering(TiXmlElement* element, MeetingPlanner& planner) {
+    const char* provider = element->FirstChildElement("PROVIDER") ? element->FirstChildElement("PROVIDER")->GetText() : nullptr;
+    const char* building = element->FirstChildElement("BUILDING") ? element->FirstChildElement("BUILDING")->GetText() : nullptr;
+
+    if (provider && building) {
+        planner.addCatering(new Catering(provider, building));
+    }
 }

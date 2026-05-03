@@ -1,0 +1,58 @@
+<SYSTEM>
+    <!-- STAP 1: Voeg Campussen toe (Nieuw in 2.0) -->
+    <CAMPUS>
+        <NAME>Campus Middelheim</NAME>
+        <IDENTIFIER>C_MIDDELHEIM</IDENTIFIER>
+    </CAMPUS>
+
+    <!-- STAP 2: Voeg Gebouwen toe en link naar de Campus (Nieuw in 2.0) -->
+    <BUILDING>
+        <NAME>Gebouw G</NAME>
+        <IDENTIFIER>B_GEBOUW_G</IDENTIFIER>
+        <CAMPUS>C_MIDDELHEIM</CAMPUS>
+    </BUILDING>
+
+    <!-- STAP 3: Pas je Rooms aan (Voeg CAMPUS en BUILDING toe) -->
+    <ROOM>
+        <NAME>M.G.025</NAME>
+        <IDENTIFIER>Room_1</IDENTIFIER>
+        <CAPACITY>55</CAPACITY>
+        <CAMPUS>C_MIDDELHEIM</CAMPUS>
+        <BUILDING>B_GEBOUW_G</BUILDING>
+    </ROOM>
+    <ROOM>
+        <NAME>M.G.023</NAME>
+        <IDENTIFIER>Room_2</IDENTIFIER>
+        <CAPACITY>10</CAPACITY>
+        <CAMPUS>C_MIDDELHEIM</CAMPUS>
+        <BUILDING>B_GEBOUW_G</BUILDING>
+    </ROOM>
+
+    <!-- STAP 4: Je Meetings blijven hetzelfde (ze verwijzen nog steeds naar Room_1/Room_2) -->
+    <MEETING>
+        <LABEL>Weekly Meeting</LABEL>
+        <IDENTIFIER>Meeting_1</IDENTIFIER>
+        <ROOM>Room_2</ROOM>
+        <DATE>2026-05-22</DATE>
+    </MEETING>
+    <MEETING>
+        <LABEL>Project Presentation</LABEL>
+        <IDENTIFIER>Meeting_2</IDENTIFIER>
+        <ROOM>Room_1</ROOM>
+        <DATE>2026-06-10</DATE>
+    </MEETING>
+
+    <!-- STAP 5: Je Participations blijven hetzelfde -->
+    <PARTICIPATION>
+        <MEETING>Meeting_1</MEETING>
+        <USER>Kasper Engelen</USER>
+    </PARTICIPATION>
+    <PARTICIPATION>
+        <MEETING>Meeting_1</MEETING>
+        <USER>Serge Demeyer</USER>
+    </PARTICIPATION>
+    <PARTICIPATION>
+        <MEETING>Meeting_2</MEETING>
+        <USER>Denys</USER>
+    </PARTICIPATION>
+</SYSTEM>

@@ -21,7 +21,16 @@ set(CORE_SOURCES
 add_executable(MeetingPlanner src/main.cpp ${CORE_SOURCES}
         src/Room.cpp
         src/Meeting.cpp
-        src/MeetingPlanner.cpp)
+        src/MeetingPlanner.cpp
+        src/Campus.cpp
+        include/Campus.h
+        src/Building.cpp
+        include/Building.h
+        src/Renovation.cpp
+        include/Renovation.h
+        src/Catering.cpp
+        include/Catering.h
+)
 
 # --- Google Test setup ---
 include(FetchContent)

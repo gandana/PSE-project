@@ -27,7 +27,19 @@ public:
     void loadFile(const std::string& filename, MeetingPlanner& planner);
 
 private:
-    bool properlyInitialized; // De variabele die de compiler zocht
+    bool properlyInitialized;
+
+    // --- NIEUW IN SYSTEEM 2.0 ---
+    /**
+     * @brief Parst een specifiek <CAMPUS> XML-element.
+     */
+    void parseCampus(TiXmlElement* element, MeetingPlanner& planner);
+
+    /**
+     * @brief Parst een specifiek <BUILDING> XML-element.
+     */
+    void parseBuilding(TiXmlElement* element, MeetingPlanner& planner);
+    // ----------------------------
 
     /**
      * @brief Parst een specifiek <ROOM> XML-element.
@@ -43,6 +55,8 @@ private:
      * @brief Parst participaties binnen een meeting.
      */
     void parseParticipation(TiXmlElement* element, MeetingPlanner& planner);
+    void parseRenovation(TiXmlElement* element, MeetingPlanner& planner);
+    void parseCatering(TiXmlElement* element, MeetingPlanner& planner);
 };
 
 #endif // SYSTEMPARSER_H

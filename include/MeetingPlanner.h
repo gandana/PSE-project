@@ -2,51 +2,45 @@
 #define MEETINGPLANNER_H
 
 #include <vector>
-#include <string>
+#include "Campus.h"
+#include "Building.h"
 #include "Room.h"
 #include "Meeting.h"
-#include "DesignByContract.h"
+#include "Renovation.h"
+#include "Catering.h"
 
-/**
- * @class MeetingPlanner
- * @brief Beheert de kamers en vergaderingen en voert de simulatie uit.
- */
 class MeetingPlanner {
 private:
-    std::vector<Room> rooms;
-    std::vector<Meeting> meetings;
-    bool properlyInitialized;
+    std::vector<Campus*> fCampuses;
+    std::vector<Building*> fBuildings;
+    std::vector<Room*> fRooms;      // Gebruik pointers voor consistentie met Systeem 2.0
+    std::vector<Meeting*> fMeetings;
+    std::vector<Renovation*> fRenovations;
+    std::vector<Catering*> fCaterings;
+
+    void exportSystem(const std::string& filename) const;
+    
+    bool fProperlyInitialized;
 
 public:
-    /**
-     * @brief Constructor voor de MeetingPlanner.
-     */
     MeetingPlanner();
+    ~MeetingPlanner(); // Cruciaal voor geheugenbeheer van de pointers!
 
-    /**
-     * @brief Controleert of de planner correct is geïnitialiseerd.
-     */
     bool isProperlyInitialized() const;
 
-    // --- Data Management ---
-    void addRoom(const Room& room);
-    void addMeeting(const Meeting& meeting);
-    void addParticipation(const std::string& meetingId, const std::string& userName);
+    // Functies voor de parser
+    void addCampus(Campus* c);
+    void addBuilding(Building* b);
+    void addRoom(Room* r);
+    void addMeeting(Meeting* m);
+    void addRenovation(Renovation* ren);
+    void addCatering(Catering* cat);
+    // In MeetingPlanner.h
+    void addParticipation(const std::string& meetingId, const std::string& userId);
 
-    // --- Getters ---
-    const std::vector<Room>& getRooms() const;
-    const std::vector<Meeting>& getMeetings() const;
-
-    // --- Simulatie Logica ---
-    /**
-     * @brief Verwerkt één specifieke meeting en controleert op conflicten.
-     */
-    void processMeeting(const std::string& meetingId);
-
-    /**
-     * @brief Verwerkt automatisch alle meetings in het systeem.
-     */
-    void processAllMeetings();
+    // Hulpmiddelen voor consistentie (Appendix B)
+    bool campusExists(const std::string& id) const;
+    bool buildingExists(const std::string& id) const;
 };
 
-#endif // MEETINGPLANNER_H
+#endif
