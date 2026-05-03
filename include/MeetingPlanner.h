@@ -17,8 +17,6 @@ private:
     std::vector<Meeting*> fMeetings;
     std::vector<Renovation*> fRenovations;
     std::vector<Catering*> fCaterings;
-
-    void exportSystem(const std::string& filename) const;
     
     bool fProperlyInitialized;
 
@@ -37,6 +35,7 @@ public:
     void addCatering(Catering* cat);
     // In MeetingPlanner.h
     void addParticipation(const std::string& meetingId, const std::string& userId);
+    void exportSystem(const std::string& filename) const;
 
     // Hulpmiddelen voor consistentie (Appendix B)
     bool campusExists(const std::string& id) const;
