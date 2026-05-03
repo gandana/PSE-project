@@ -12,6 +12,10 @@
  */
 class Meeting {
 private:
+    bool fIsOnline;
+    bool fAllowsExternals;
+    // We houden bij hoeveel externen er zijn voor de CO2 berekening
+    int fExternalCount;
     std::string fLabel;
     std::string fIdentifier;
     std::string fRoomId;
@@ -31,6 +35,11 @@ public:
      * @brief Controleert of het object correct is geïnitialiseerd.
      */
     bool isProperlyInitialized() const;
+    /**
+     * @brief Geeft het aantal deelnemers aan de meeting terug.
+     * @return Het aantal deelnemers als integer.
+     */
+    int getParticipantCount() const;
 
     // --- GETTERS ---
     const std::string& getLabel() const;
@@ -40,12 +49,16 @@ public:
     const std::vector<std::string>& getParticipants() const;
     bool isProcessed() const;
     bool isCanceled() const;
+    bool isOnline() const;
+    void setOnline(bool online);
+    double calculateCO2() const; // De nieuwe rekenfunctie
+
 
     // --- SETTERS & ACTIONS ---
     /**
      * @brief Voegt een deelnemer toe aan de meeting.
      */
-    void addParticipant(const std::string& userName);
+    void addParticipant(const std::string& userName, bool isExternal = false);
 
     /**
      * @brief Zet de verwerkingsstatus van de meeting.
@@ -56,6 +69,7 @@ public:
      * @brief Zet de geannuleerde status van de meeting.
      */
     void setCanceled(bool status);
+
 };
 
 #endif // INC_MEETING_H

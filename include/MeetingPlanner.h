@@ -2,6 +2,8 @@
 #define MEETINGPLANNER_H
 
 #include <vector>
+#include <string> // Cruciaal voor std::string!
+#include "DesignByContract.h" // Zorg dat dit bestand in je include map staat
 #include "Campus.h"
 #include "Building.h"
 #include "Room.h"
@@ -13,7 +15,7 @@ class MeetingPlanner {
 private:
     std::vector<Campus*> fCampuses;
     std::vector<Building*> fBuildings;
-    std::vector<Room*> fRooms;      // Gebruik pointers voor consistentie met Systeem 2.0
+    std::vector<Room*> fRooms;
     std::vector<Meeting*> fMeetings;
     std::vector<Renovation*> fRenovations;
     std::vector<Catering*> fCaterings;
@@ -22,7 +24,7 @@ private:
 
 public:
     MeetingPlanner();
-    ~MeetingPlanner(); // Cruciaal voor geheugenbeheer van de pointers!
+    ~MeetingPlanner();
 
     bool isProperlyInitialized() const;
 
@@ -33,17 +35,16 @@ public:
     void addMeeting(Meeting* m);
     void addRenovation(Renovation* ren);
     void addCatering(Catering* cat);
-    // In MeetingPlanner.h
-    void addParticipation(const std::string& meetingId, const std::string& userId);
-    void exportSystem(const std::string& filename) const;
+
+void addParticipation(const std::string& meetingId, const std::string& userId, bool isExternal = false);    void exportSystem(const std::string& filename) const;
     void runSimulation();
-    // De getter voor Rooms (nodig voor de if-check in main)
+
     const std::vector<Room*>& getRooms() const { return fRooms; }
     const std::vector<Meeting*>& getMeetings() const { return fMeetings; }
-    // De functie die je main aanroept
+
     void processAllMeetings();
 
-    // Hulpmiddelen voor consistentie (Appendix B)
+    // Hulpmiddelen voor consistentie
     bool campusExists(const std::string& id) const;
     bool buildingExists(const std::string& id) const;
 };

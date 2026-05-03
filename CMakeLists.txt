@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
-# 1. Alleen de gedeelde logica (GEEN main en GEEN testen)
+# 1. ALLE logica bestanden (De "motor" van je programma)
+# Hier moeten alle .cpp bestanden staan behalve main.cpp en de tests.
 set(CORE_SOURCES
         src/tinyxml.cpp
         src/tinyxmlerror.cpp
@@ -14,23 +15,18 @@ set(CORE_SOURCES
         src/tinystr.cpp
         src/SystemParser.cpp
         src/SystemOutput.cpp
-        # Room.cpp en Meeting.cpp moeten hier ook bij als je die hebt!
-)
-
-# 2. Het echte programma: main + core
-add_executable(MeetingPlanner src/main.cpp ${CORE_SOURCES}
         src/Room.cpp
         src/Meeting.cpp
         src/MeetingPlanner.cpp
         src/Campus.cpp
-        include/Campus.h
         src/Building.cpp
-        include/Building.h
         src/Renovation.cpp
-        include/Renovation.h
         src/Catering.cpp
-        include/Catering.h
 )
+
+# 2. Het echte programma
+# Gebruikt main.cpp + alle core bestanden
+add_executable(MeetingPlanner src/main.cpp ${CORE_SOURCES})
 
 # --- Google Test setup ---
 include(FetchContent)
@@ -42,7 +38,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # 3. De Test Executable
-# Hier voeg je alle test-bestanden toe (ook RoomTesting.cpp)
+# Gebruikt de test-bestanden + ALLE core bestanden om "undefined references" te voorkomen
 add_executable(run_meeting_tests
         tests/RoomTesting.cpp
         tests/DomainTests.cpp
@@ -50,8 +46,9 @@ add_executable(run_meeting_tests
         ${CORE_SOURCES}
 )
 
+# Link de Google Test bibliotheek
 target_link_libraries(run_meeting_tests GTest::gtest_main)
 target_include_directories(run_meeting_tests PRIVATE include)
 
-# Bestanden kopiëren voor de tests
+# Zorg dat de XML bestanden beschikbaar zijn in de build map
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/input DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

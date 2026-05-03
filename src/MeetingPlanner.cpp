@@ -1,5 +1,7 @@
 #include "MeetingPlanner.h"
 #include "tinyxml.h"
+#include <algorithm>  // Nodig voor std::find
+#include <iostream>   // Nodig voor std::cerr en std::cout
 
 
 MeetingPlanner::MeetingPlanner() : fProperlyInitialized(true) {
@@ -158,20 +160,16 @@ void MeetingPlanner::exportSystem(const std::string& filename) const {
     doc.SaveFile(filename.c_str());
 }
 
-void MeetingPlanner::addParticipation(const std::string& meetingId, const std::string& userId) {
+void MeetingPlanner::addParticipation(const std::string& meetingId, const std::string& userId, bool isExternal) {
     REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
 
-    // We lopen door al onze meetings heen om de juiste te vinden
     for (Meeting* m : fMeetings) {
-        // Is dit de meeting die in de XML wordt genoemd?
         if (m->getIdentifier() == meetingId) {
-            // Ja! Voeg de user toe aan de lijst van deze specifieke meeting
-            m->addParticipant(userId);
-            return; // We zijn klaar, we kunnen stoppen met zoeken
+            // Nu geven we ook door of de persoon extern is
+            m->addParticipant(userId, isExternal);
+            return;
         }
     }
-
-    // Als we hier komen, bestond de meetingId niet in onze lijst
     std::cerr << "Fout: Kan deelnemer " << userId << " niet toevoegen aan onbekende meeting " << meetingId << std::endl;
 }
 
@@ -180,45 +178,42 @@ void MeetingPlanner::runSimulation() {
 
     std::cout << "\n--- START SIMULATIE ---\n" << std::endl;
 
+    // Eerst alle logica uitvoeren (capaciteit, renovatie, overlappingen)
+    processAllMeetings();
+
+    double totaalCO2 = 0.0;
+
     for (Meeting* m : fMeetings) {
-        // 1. Zoek de kamer die bij deze meeting hoort
-        Room* targetRoom = nullptr;
-        for (Room* r : fRooms) {
-            if (r->getIdentifier() == m->getRoomId()) {
-                targetRoom = r;
-                break;
-            }
-        }
-
-        // Check of de kamer bestaat
-        if (targetRoom == nullptr) {
-            m->setCanceled(true);
-            continue;
-        }
-
-        // 2. De eigenlijke check (Punt 3.1 & 3.2 van je lijst)
-        int aantalDeelnemers = m->getParticipants().size();
-        int capaciteitKamer = targetRoom->getCapacity();
-
-        if (aantalDeelnemers > capaciteitKamer) {
-            m->setCanceled(true); // Te veel mensen -> annuleren
-            std::cout << "[GEANNULEERD] " << m->getLabel() << " past niet in " << targetRoom->getName() << std::endl;
+        if (m->isCanceled()) {
+            std::cout << "[GEANNULEERD] " << m->getLabel() << " (ID: " << m->getIdentifier() << ")" << std::endl;
         } else {
-            m->setCanceled(false); // Past wel -> OK!
-            std::cout << "[OK] " << m->getLabel() << " kan doorgaan." << std::endl;
+            // Bereken CO2 voor deze specifieke meeting
+            double meetingCO2 = m->calculateCO2();
+            totaalCO2 += meetingCO2;
+
+            std::cout << "[OK] " << m->getLabel()
+                      << " | Deelnemers: " << m->getParticipantCount()
+                      << " | CO2: " << meetingCO2 << "g" << std::endl;
         }
-        m->setProcessed(true); // Markeer als gecheckt
     }
-    std::cout << "\n--- EINDE SIMULATIE ---\n" << std::endl;
+
+    std::cout << "\n-----------------------" << std::endl;
+    std::cout << "Totale CO2-uitstoot: " << totaalCO2 << "g" << std::endl;
+    std::cout << "--- EINDE SIMULATIE ---\n" << std::endl;
 }
 
 void MeetingPlanner::processAllMeetings() {
     REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
 
-    std::cout << "Bezig met verwerken van alle meetings...\n";
-
     for (Meeting* m : fMeetings) {
-        // 1. Zoek de kamer op
+        // --- STAP 0: CHECK ONLINE STATUS (Use Case 3.4) ---
+        if (m->isOnline()) {
+            m->setProcessed(true);
+            m->setCanceled(false); // Online gaat altijd door
+            continue; // Sla alle kamer-checks over!
+        }
+
+        // 1. Zoek de kamer (alleen voor fysieke meetings)
         Room* targetRoom = nullptr;
         for (Room* r : fRooms) {
             if (r->getIdentifier() == m->getRoomId()) {
@@ -229,16 +224,73 @@ void MeetingPlanner::processAllMeetings() {
 
         if (targetRoom == nullptr) {
             m->setCanceled(true);
+            m->setProcessed(true);
             continue;
         }
 
-        // 2. Check capaciteit
-        int aantalDeelnemers = m->getParticipants().size();
-        if (aantalDeelnemers > targetRoom->getCapacity()) {
+        // --- CHECK 1: CAPACITEIT ---
+        if (m->getParticipants().size() > (size_t)targetRoom->getCapacity()) {
             m->setCanceled(true);
-        } else {
-            m->setCanceled(false);
         }
+
+        // Datum berekenen
+        std::time_t meetingTime = std::chrono::system_clock::to_time_t(m->getDate());
+        int meetingDay = std::localtime(&meetingTime)->tm_yday + 1;
+
+        // --- CHECK 2: RENOVATIES (Use Case 3.3) ---
+        if (!m->isCanceled()) {
+            for (Renovation* ren : fRenovations) {
+                if (ren->getRoomId() == m->getRoomId()) {
+                    if (meetingDay >= ren->getStartDay() && meetingDay <= ren->getEndDay()) {
+                        m->setCanceled(true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // --- CHECK 3: OVERLAPPINGEN ---
+        if (!m->isCanceled()) {
+            for (Meeting* other : fMeetings) {
+                if (other == m) continue;
+                if (!other->isProcessed() || other->isCanceled() || other->isOnline()) continue;
+
+                if (other->getRoomId() == m->getRoomId()) {
+                    std::time_t otherTime = std::chrono::system_clock::to_time_t(other->getDate());
+                    int otherDay = std::localtime(&otherTime)->tm_yday + 1;
+
+                    if (meetingDay == otherDay) {
+                        m->setCanceled(true);
+                        break;
+                    }
+                }
+            }
+        }
+
         m->setProcessed(true);
     }
+}
+
+void MeetingPlanner::addMeeting(Meeting* m) {
+    REQUIRE(this->isProperlyInitialized(), "MeetingPlanner was niet correct geïnitialiseerd");
+    REQUIRE(m != nullptr, "Kan geen null-pointer als meeting toevoegen");
+
+    fMeetings.push_back(m);
+
+    ENSURE(std::find(fMeetings.begin(), fMeetings.end(), m) != fMeetings.end(),
+           "Meeting is niet correct toegevoegd aan de lijst");
+}
+
+bool MeetingPlanner::campusExists(const std::string& id) const {
+    for (Campus* c : fCampuses) {
+        if (c->getIdentifier() == id) return true;
+    }
+    return false;
+}
+
+bool MeetingPlanner::buildingExists(const std::string& id) const {
+    for (Building* b : fBuildings) {
+        if (b->getIdentifier() == id) return true;
+    }
+    return false;
 }

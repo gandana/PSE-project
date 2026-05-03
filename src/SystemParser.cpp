@@ -23,29 +23,26 @@ void SystemParser::loadFile(const std::string& filename, MeetingPlanner& planner
     REQUIRE(!filename.empty(), "Filename cannot be empty");
 
     TiXmlDocument doc(filename.c_str());
-    if (!doc.LoadFile()) {
-        std::cerr << "Error: Could not open input file: " << filename << "\n";
-        return;
-    }
+
+    // CRUCIAAL VOOR DE TEST:
+    // Gebruik REQUIRE in plaats van een simpele if-check met return.
+    // Als LoadFile faalt, MOET het programma stoppen (die).
+    REQUIRE(doc.LoadFile(), (std::string("Could not open input file: ") + filename).c_str());
 
     TiXmlElement* root = doc.FirstChildElement("SYSTEM");
-    if (!root) {
-        std::cerr << "Error: No <SYSTEM> root tag found.\n";
-        return;
-    }
+    REQUIRE(root != nullptr, "No <SYSTEM> root tag found.");
 
-    // --- STAP 1: Eerst alle CAMPUS elementen inlezen ---
+    // --- STAP 1: Campussen ---
     for (TiXmlElement* elem = root->FirstChildElement("CAMPUS"); elem != nullptr; elem = elem->NextSiblingElement("CAMPUS")) {
         parseCampus(elem, planner);
     }
 
-    // --- STAP 2: Dan alle BUILDING elementen ---
+    // --- STAP 2: Gebouwen ---
     for (TiXmlElement* elem = root->FirstChildElement("BUILDING"); elem != nullptr; elem = elem->NextSiblingElement("BUILDING")) {
         parseBuilding(elem, planner);
     }
 
-    // --- STAP 3: De rest van de elementen in de juiste volgorde ---
-    // We lopen nog een keer door de root om de rest te vinden
+    // --- STAP 3: De rest (Rooms, Meetings, etc.) ---
     for (TiXmlElement* elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement()) {
         std::string elemName = elem->Value();
 
@@ -56,6 +53,7 @@ void SystemParser::loadFile(const std::string& filename, MeetingPlanner& planner
         } else if (elemName == "PARTICIPATION") {
             parseParticipation(elem, planner);
         }
+        // Voeg hier eventueel RENOVATION of CATERING toe
     }
 }
 
@@ -86,7 +84,7 @@ void SystemParser::parseBuilding(TiXmlElement* element, MeetingPlanner& planner)
     planner.addBuilding(newBuilding);
 }
 
-void SystemParser::parseRoom(TiXmlElement* element, MeetingPlanner& planner) {
+void SystemParser::parseRoom(TiXmlElement* element, MeetingPlanner& planner) { // Voeg de 'v' van void toe
     TiXmlElement* nameElem = element->FirstChildElement("NAME");
     TiXmlElement* idElem = element->FirstChildElement("IDENTIFIER");
     TiXmlElement* capElem = element->FirstChildElement("CAPACITY");
@@ -98,13 +96,22 @@ void SystemParser::parseRoom(TiXmlElement* element, MeetingPlanner& planner) {
         return;
     }
 
-    int capacity = std::stoi(capElem->GetText());
+    // Veiligere manier om tekst op te halen
+    const char* name = nameElem->GetText();
+    const char* id = idElem->GetText();
+    const char* capText = capElem->GetText();
+    const char* campus = campusElem->GetText();
+    const char* build = buildElem->GetText();
 
-    // FIX: Gebruik 'new' om een pointer te maken
-    Room* roomPtr = new Room(nameElem->GetText(), idElem->GetText(), capacity,
-                             campusElem->GetText(), buildElem->GetText());
+    if (!name || !id || !capText || !campus || !build) {
+        std::cerr << "Error: One of the room fields is empty in XML. Skipping.\n";
+        return;
+    }
 
-    planner.addRoom(roomPtr); // Nu matcht het type: het is een Room*
+    int capacity = std::stoi(capText);
+
+    Room* roomPtr = new Room(name, id, capacity, campus, build);
+    planner.addRoom(roomPtr);
 }
 
 void SystemParser::parseMeeting(TiXmlElement* element, MeetingPlanner& planner) {
@@ -137,19 +144,40 @@ void SystemParser::parseMeeting(TiXmlElement* element, MeetingPlanner& planner) 
     Meeting* meetingPtr = new Meeting(labelElem->GetText(), idElem->GetText(),
                                       roomElem->GetText(), time_point);
 
+    // Kijk of het woordje ONLINE="TRUE" in de XML-tag staat
+    const char* onlineAttr = element->Attribute("ONLINE");
+    if (onlineAttr != nullptr && std::string(onlineAttr) == "TRUE") {
+        meetingPtr->setOnline(true); // Zet de meeting op online
+    }
+
     planner.addMeeting(meetingPtr); // Nu matcht het type: het is een Meeting*
 }
 
 void SystemParser::parseParticipation(TiXmlElement* element, MeetingPlanner& planner) {
+    // 1. Haal de sub-elementen MEETING en USER op
     TiXmlElement* meetingElem = element->FirstChildElement("MEETING");
     TiXmlElement* userElem = element->FirstChildElement("USER");
 
+    // Veiligheidscheck: bestaan de elementen en zit er tekst in?
     if (!meetingElem || !userElem || !meetingElem->GetText() || !userElem->GetText()) {
         return;
     }
 
-    planner.addParticipation(meetingElem->GetText(), userElem->GetText());
+    // --- NIEUW VOOR SYSTEEM 2.0: Check of de user EXTERNAL is ---
+    // We kijken in de <USER> tag of er TYPE="EXTERNAL" staat
+    bool isExtern = false;
+    const char* typeAttr = userElem->Attribute("TYPE");
+
+    if (typeAttr != nullptr && std::string(typeAttr) == "EXTERNAL") {
+        isExtern = true;
+    }
+
+    // 2. Geef de meetingID, userID én de isExtern-status door aan de planner
+    // Let op: zorg dat je addParticipation in MeetingPlanner.h ook 'bool isExternal' accepteert!
+    planner.addParticipation(meetingElem->GetText(), userElem->GetText(), isExtern);
 }
+
+
 void SystemParser::parseRenovation(TiXmlElement* element, MeetingPlanner& planner) {
     const char* room = element->FirstChildElement("ROOM") ? element->FirstChildElement("ROOM")->GetText() : nullptr;
     TiXmlElement* startElem = element->FirstChildElement("START");

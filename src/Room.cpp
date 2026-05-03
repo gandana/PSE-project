@@ -6,8 +6,10 @@ Room::Room(const std::string& name, const std::string& id, int capacity,
     : fName(name), fIdentifier(id), fCapacity(capacity),
       fCampusId(campusId), fBuildingId(buildingId), fProperlyInitialized(false) {
 
-    // Deze twee zijn verplicht voor je domeintesten:
     REQUIRE(!name.empty(), "Name cannot be empty");
+    REQUIRE(!id.empty(), "Identifier cannot be empty"); // Belangrijk voor het koppelen van meetings!
+    REQUIRE(!campusId.empty(), "Campus ID cannot be empty");
+    REQUIRE(!buildingId.empty(), "Building ID cannot be empty");
     REQUIRE(capacity > 0, "Capacity must be strictly greater than 0");
 
     fProperlyInitialized = true;
