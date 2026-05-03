@@ -9,23 +9,30 @@ int main() {
     MeetingPlanner planner;
     SystemParser parser;
 
+    // Zorg dat dit pad klopt met waar je XML staat!
     std::string filename = "input/proper_planner.xml";
-    std::string reportFile = "report.txt"; // Save next to our executable
+    std::string reportFile = "report.txt";
+    std::string xmlExport = "export_output.xml";
 
-    std::cout << "Attempting to load system from: " << filename << "...\n";
+    std::cout << "Attempting to load system...\n";
     parser.loadFile(filename, planner);
 
+    // Check of we echt iets hebben ingeladen
     if (!planner.getRooms().empty()) {
-        std::cout << "\nSuccess! System loaded properly.\n";
+        std::cout << "Success! Data loaded.\n";
 
-        //  Use Case 1.4: Auto-process all meetings
+        // 1. Voer de simulatie uit (capaciteitscheck)
         planner.processAllMeetings();
 
-        //  Use Case 1.2: Generate the Output Report
+        // 2. Genereer het tekst-rapport (voor mensen)
         SystemOutput::generateReport(planner, reportFile);
 
+        // 3. Genereer de XML export (voor Punt 2.2 van je opdracht)
+        planner.exportSystem(xmlExport);
+
+        std::cout << "\nAlles is verwerkt. Check " << reportFile << " en " << xmlExport << "\n";
     } else {
-        std::cout << "\nFailed to load data. Please check the file path.\n";
+        std::cout << "\nFailed to load data. Is de bestandsnaam correct?\n";
     }
 
     return 0;

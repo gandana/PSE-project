@@ -174,3 +174,71 @@ void MeetingPlanner::addParticipation(const std::string& meetingId, const std::s
     // Als we hier komen, bestond de meetingId niet in onze lijst
     std::cerr << "Fout: Kan deelnemer " << userId << " niet toevoegen aan onbekende meeting " << meetingId << std::endl;
 }
+
+void MeetingPlanner::runSimulation() {
+    REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd voor simulatie");
+
+    std::cout << "\n--- START SIMULATIE ---\n" << std::endl;
+
+    for (Meeting* m : fMeetings) {
+        // 1. Zoek de kamer die bij deze meeting hoort
+        Room* targetRoom = nullptr;
+        for (Room* r : fRooms) {
+            if (r->getIdentifier() == m->getRoomId()) {
+                targetRoom = r;
+                break;
+            }
+        }
+
+        // Check of de kamer bestaat
+        if (targetRoom == nullptr) {
+            m->setCanceled(true);
+            continue;
+        }
+
+        // 2. De eigenlijke check (Punt 3.1 & 3.2 van je lijst)
+        int aantalDeelnemers = m->getParticipants().size();
+        int capaciteitKamer = targetRoom->getCapacity();
+
+        if (aantalDeelnemers > capaciteitKamer) {
+            m->setCanceled(true); // Te veel mensen -> annuleren
+            std::cout << "[GEANNULEERD] " << m->getLabel() << " past niet in " << targetRoom->getName() << std::endl;
+        } else {
+            m->setCanceled(false); // Past wel -> OK!
+            std::cout << "[OK] " << m->getLabel() << " kan doorgaan." << std::endl;
+        }
+        m->setProcessed(true); // Markeer als gecheckt
+    }
+    std::cout << "\n--- EINDE SIMULATIE ---\n" << std::endl;
+}
+
+void MeetingPlanner::processAllMeetings() {
+    REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
+
+    std::cout << "Bezig met verwerken van alle meetings...\n";
+
+    for (Meeting* m : fMeetings) {
+        // 1. Zoek de kamer op
+        Room* targetRoom = nullptr;
+        for (Room* r : fRooms) {
+            if (r->getIdentifier() == m->getRoomId()) {
+                targetRoom = r;
+                break;
+            }
+        }
+
+        if (targetRoom == nullptr) {
+            m->setCanceled(true);
+            continue;
+        }
+
+        // 2. Check capaciteit
+        int aantalDeelnemers = m->getParticipants().size();
+        if (aantalDeelnemers > targetRoom->getCapacity()) {
+            m->setCanceled(true);
+        } else {
+            m->setCanceled(false);
+        }
+        m->setProcessed(true);
+    }
+}

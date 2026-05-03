@@ -17,7 +17,7 @@ private:
     std::vector<Meeting*> fMeetings;
     std::vector<Renovation*> fRenovations;
     std::vector<Catering*> fCaterings;
-    
+
     bool fProperlyInitialized;
 
 public:
@@ -36,6 +36,13 @@ public:
     // In MeetingPlanner.h
     void addParticipation(const std::string& meetingId, const std::string& userId);
     void exportSystem(const std::string& filename) const;
+    void runSimulation();
+    // De getter voor Rooms (nodig voor de if-check in main)
+    const std::vector<Room*>& getRooms() const { return fRooms; }
+    const std::vector<Room*>& getRooms() const { return fRooms; }
+    const std::vector<Meeting*>& getMeetings() const { return fMeetings; }
+    // De functie die je main aanroept
+    void processAllMeetings();
 
     // Hulpmiddelen voor consistentie (Appendix B)
     bool campusExists(const std::string& id) const;
