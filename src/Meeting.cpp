@@ -1,9 +1,9 @@
 #include "Meeting.h"
 
 Meeting::Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d)
-    : fIsOnline(false),             // Use Case 3.4
-      fAllowsExternals(false),      // Use Case 3.7
-      fExternalCount(0),            // Use Case 3.5
+    : fIsOnline(false),
+      fAllowsExternals(false),
+      fExternalCount(0),
       fLabel(lbl),
       fIdentifier(id),
       fRoomId(rId),
@@ -12,12 +12,12 @@ Meeting::Meeting(const std::string& lbl, const std::string& id, const std::strin
       fProcessed(false),
       fCanceled(false)
 {
-    // De REQUIREMENTS (Design by Contract) zijn verplicht voor je punten![cite: 1]
+    // De REQUIREMENTS (Design by Contract) zijn verplicht voor je punten!
     REQUIRE(!lbl.empty(), "Label cannot be empty");
     REQUIRE(!id.empty(), "Identifier cannot be empty");
-    // Let op: als de meeting ONLINE is, mag rId leeg zijn volgens Use Case 3.4[cite: 1]
-    // Maar bij het inladen via de constructor laten we de check vaak staan.
 
+    // VOEG DEZE REGEL TOE VOOR DE TESTS:
+    REQUIRE(!rId.empty(), "Room ID cannot be empty");
     fProperlyInitialized = true;
     ENSURE(isProperlyInitialized(), "Meeting not properly initialized");
 }

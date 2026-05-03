@@ -1,16 +1,19 @@
 #include "Room.h"
 
 // De constructor moet exact deze 5 parameters hebben zoals in je .h
+// De constructor moet exact deze 5 parameters hebben zoals in je .h
 Room::Room(const std::string& name, const std::string& id, int capacity,
            const std::string& campusId, const std::string& buildingId)
     : fName(name), fIdentifier(id), fCapacity(capacity),
       fCampusId(campusId), fBuildingId(buildingId), fProperlyInitialized(false) {
 
     REQUIRE(!name.empty(), "Name cannot be empty");
-    REQUIRE(!id.empty(), "Identifier cannot be empty"); // Belangrijk voor het koppelen van meetings!
+    REQUIRE(!id.empty(), "Identifier cannot be empty");
     REQUIRE(!campusId.empty(), "Campus ID cannot be empty");
     REQUIRE(!buildingId.empty(), "Building ID cannot be empty");
-    REQUIRE(capacity > 0, "Capacity must be strictly greater than 0");
+
+    // DEZE REGEL IS CRUCIAAL VOOR DE TEST:
+    REQUIRE(capacity > 0, "Capacity must be strictly positive");
 
     fProperlyInitialized = true;
     ENSURE(isProperlyInitialized(), "Room not properly initialized");
