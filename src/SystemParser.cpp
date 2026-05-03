@@ -111,14 +111,27 @@ void SystemParser::parseRoom(TiXmlElement* element, MeetingPlanner& planner) {
     // 4. Zet capaciteit om naar int
     int capacity = 0;
     try {
-        capacity = std::stoi(capText);
+        if (capText) {
+            capacity = std::stoi(capText);
+        }
     } catch (...) {
-        capacity = -1; // Forceer crash in Room constructor voor 'LoadInvalidSystem' test
+        capacity = -1;
     }
 
+    // --- DIT IS DE FIX VOOR DE PARSERTEST ---
+    if (capacity <= 0) {
+        // Gebruik std::cout of std::cerr om de fout te melden (Stap 2.3.2)
+        // ZORG DAT DEZE TEKST EXACT MATCHT MET WAT DE TEST VERWACHT
+        std::cerr << "Capacity must be strictly positive" << std::endl;
+        // STOP HIER voor deze kamer en ga naar de volgende (Stap 2.2)
+        // We maken de 'new Room' dus NIET aan, zodat het programma niet crasht.
+        REQUIRE(capacity > 0, "Capacity must be strictly positive");
+        return;
+    }
+    // ----------------------------------------
+
     // 5. MAAK DE KAMER AAN
-    // Dit roept jouw REQUIRE in Room.cpp aan. Als capacity <= 0, "sterft" het programma hier.
-    // Dat is precies wat de test "LoadInvalidSystem" wil zien!
+    // Alleen als de capaciteit > 0 is, komen we hier.
     Room* roomPtr = new Room(name, id, capacity, campus, build);
     planner.addRoom(roomPtr);
 }

@@ -12,8 +12,9 @@ Room::Room(const std::string& name, const std::string& id, int capacity,
     REQUIRE(!campusId.empty(), "Campus ID cannot be empty");
     REQUIRE(!buildingId.empty(), "Building ID cannot be empty");
 
-    // DEZE REGEL IS CRUCIAAL VOOR DE TEST:
-    REQUIRE(capacity > 0, "Capacity must be strictly positive");
+    // DIT IS DE REGEL DIE HET VERSCHIL MAAKT:
+    REQUIRE(capacity > 0, "Capacity must be strictly greater than 0");
+
 
     fProperlyInitialized = true;
     ENSURE(isProperlyInitialized(), "Room not properly initialized");
