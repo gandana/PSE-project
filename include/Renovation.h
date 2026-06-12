@@ -6,17 +6,44 @@
 class Renovation {
 private:
     std::string fRoomId;
-    int fStartDay; // Bijv. dag van het jaar (1-365)
+    int fStartDay;
     int fEndDay;
     bool fProperlyInitialized;
 
 public:
+
+    /**
+     * REQUIRE(!roomId.empty())
+     * REQUIRE(start > 0)
+     * REQUIRE(end >= start)
+     * ENSURE(isProperlyInitialized())
+     * ENSURE(getRoomId() == roomId)
+     * ENSURE(getStartDay() == start)
+     * ENSURE(getEndDay() == end)
+     */
     Renovation(const std::string& roomId, int start, int end);
+
+    /**
+     * ENSURE(result == true || result == false)
+     */
     bool isProperlyInitialized() const;
-    
-    // Getters
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * ENSURE(!result.empty())
+     */
     std::string getRoomId() const;
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * ENSURE(result > 0)
+     */
     int getStartDay() const;
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * ENSURE(result >= getStartDay())
+     */
     int getEndDay() const;
 };
 

@@ -1,6 +1,9 @@
 #include "Meeting.h"
 
-Meeting::Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d)
+Meeting::Meeting(const std::string& lbl,
+                 const std::string& id,
+                 const std::string& rId,
+                 std::chrono::system_clock::time_point d)
     : fIsOnline(false),
       fAllowsExternals(false),
       fExternalCount(0),
@@ -12,14 +15,19 @@ Meeting::Meeting(const std::string& lbl, const std::string& id, const std::strin
       fProcessed(false),
       fCanceled(false)
 {
-    // De REQUIREMENTS (Design by Contract) zijn verplicht voor je punten!
     REQUIRE(!lbl.empty(), "Label cannot be empty");
     REQUIRE(!id.empty(), "Identifier cannot be empty");
-
-    // VOEG DEZE REGEL TOE VOOR DE TESTS:
     REQUIRE(!rId.empty(), "Room ID cannot be empty");
+
     fProperlyInitialized = true;
+
     ENSURE(isProperlyInitialized(), "Meeting not properly initialized");
+    ENSURE(fLabel == lbl, "Label was not set correctly");
+    ENSURE(fIdentifier == id, "Identifier was not set correctly");
+    ENSURE(fRoomId == rId, "Room ID was not set correctly");
+    ENSURE(!fProcessed, "Meeting should not be processed initially");
+    ENSURE(!fCanceled, "Meeting should not be canceled initially");
+    ENSURE(fParticipants.empty(), "Meeting should start with no participants");
 }
 bool Meeting::isProperlyInitialized() const {
     return fProperlyInitialized;
@@ -27,14 +35,24 @@ bool Meeting::isProperlyInitialized() const {
 
 void Meeting::addParticipant(const std::string& userName, bool isExternal) {
     REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
-    // Belangrijk voor de test en Use Case 1.1: USER mag niet leeg zijn
     REQUIRE(!userName.empty(), "User name cannot be empty");
+
+    size_t oldSize = fParticipants.size();
+    int oldExternalCount = fExternalCount;
 
     fParticipants.push_back(userName);
 
-    // Use Case 3.5 & 3.7: Als de gebruiker extern is, tellen we dit op voor de CO2
     if (isExternal) {
         fExternalCount++;
+    }
+
+    ENSURE(fParticipants.size() == oldSize + 1, "Participant was not added");
+    ENSURE(fParticipants.back() == userName, "Wrong participant added");
+
+    if (isExternal) {
+        ENSURE(fExternalCount == oldExternalCount + 1, "External count was not updated");
+    } else {
+        ENSURE(fExternalCount == oldExternalCount, "External count changed incorrectly");
     }
 }
 
@@ -76,12 +94,20 @@ bool Meeting::isCanceled() const {
 
 void Meeting::setProcessed(bool status) {
     REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
+
     fProcessed = status;
+
+    ENSURE(fProcessed == status,
+           "Processed status not set correctly");
 }
 
 void Meeting::setCanceled(bool status) {
     REQUIRE(isProperlyInitialized(), "Meeting not properly initialized");
+
     fCanceled = status;
+
+    ENSURE(fCanceled == status,
+           "Canceled status not set correctly");
 }
 double Meeting::calculateCO2() const {
     REQUIRE(isProperlyInitialized(), "Meeting niet geinitialiseerd");

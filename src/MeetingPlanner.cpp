@@ -22,28 +22,49 @@ void MeetingPlanner::addCampus(Campus* c) {
     REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
     REQUIRE(c != nullptr, "Campus mag niet null zijn");
     fCampuses.push_back(c);
+
+    ENSURE(std::find(fCampuses.begin(),
+                 fCampuses.end(),
+                 c) != fCampuses.end(),
+       "Campus werd niet toegevoegd");
 }
 
 void MeetingPlanner::addBuilding(Building* b) {
     REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
     REQUIRE(b != nullptr, "Building mag niet null zijn");
     fBuildings.push_back(b);
+    ENSURE(std::find(fBuildings.begin(),
+                 fBuildings.end(),
+                 b) != fBuildings.end(),
+       "Building werd niet toegevoegd");
 }
 
 void MeetingPlanner::addRoom(Room* r) {
     REQUIRE(isProperlyInitialized(), "Planner niet geïnitialiseerd");
     REQUIRE(r != nullptr, "Room mag niet null zijn");
     fRooms.push_back(r);
+    ENSURE(std::find(fRooms.begin(),
+                 fRooms.end(),
+                 r) != fRooms.end(),
+       "Room werd niet toegevoegd");
 }
 
 void MeetingPlanner::addRenovation(Renovation* ren) {
     REQUIRE(ren != nullptr, "Renovatie mag niet null zijn");
     fRenovations.push_back(ren);
+    ENSURE(std::find(fRenovations.begin(),
+                 fRenovations.end(),
+                 ren) != fRenovations.end(),
+       "Renovation werd niet toegevoegd");
 }
 
 void MeetingPlanner::addCatering(Catering* cat) {
     REQUIRE(cat != nullptr, "Catering mag niet null zijn");
     fCaterings.push_back(cat);
+    ENSURE(std::find(fCaterings.begin(),
+                 fCaterings.end(),
+                 cat) != fCaterings.end(),
+       "Catering werd niet toegevoegd");
 }
 
 bool MeetingPlanner::isProperlyInitialized() const {

@@ -23,20 +23,60 @@ private:
     bool fProperlyInitialized;
 
 public:
-    MeetingPlanner();
-    ~MeetingPlanner();
+    /**
+     * ENSURE(isProperlyInitialized())
+     */
+    MeetingPlanner();    ~MeetingPlanner();
 
     bool isProperlyInitialized() const;
 
     // Functies voor de parser
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(c != nullptr)
+     * ENSURE(campusExists(c->getIdentifier()))
+     */
     void addCampus(Campus* c);
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(b != nullptr)
+     * ENSURE(buildingExists(b->getIdentifier()))
+     */
     void addBuilding(Building* b);
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(r != nullptr)
+     * ENSURE(room is added)
+     */
     void addRoom(Room* r);
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(m != nullptr)
+     * ENSURE(meeting is added)
+     */
     void addMeeting(Meeting* m);
     void addRenovation(Renovation* ren);
     void addCatering(Catering* cat);
 
-void addParticipation(const std::string& meetingId, const std::string& userId, bool isExternal = false);    void exportSystem(const std::string& filename) const;
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(!meetingId.empty())
+     * REQUIRE(!userId.empty())
+     * ENSURE(participant is added to the correct meeting)
+     */
+    void addParticipation(const std::string& meetingId,
+                          const std::string& userId,
+                          bool isExternal = false);
+
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(!filename.empty())
+     * ENSURE(output file is created)
+     */
+    void exportSystem(const std::string& filename) const;
     void runSimulation();
 
     const std::vector<Room*>& getRooms() const { return fRooms; }

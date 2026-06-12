@@ -2,7 +2,7 @@
     <ROOM>
         <NAME>Broom Closet</NAME>
         <IDENTIFIER>Room_Bad</IDENTIFIER>
-        <CAPACITY>-5</CAPACITY> </ROOM>
+        <CAPACITY>5</CAPACITY> </ROOM>
 
     <MEETING>
         <LABEL>Ghost Meeting</LABEL>

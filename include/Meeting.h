@@ -33,8 +33,19 @@ public:
     /**
      * @brief Constructor voor een Meeting object.
      */
-    Meeting(const std::string& lbl, const std::string& id, const std::string& rId, std::chrono::system_clock::time_point d);
-
+    /**
+     * REQUIRE(!lbl.empty())
+     * REQUIRE(!id.empty())
+     * REQUIRE(!rId.empty())
+     * ENSURE(isProperlyInitialized())
+     * ENSURE(getLabel() == lbl)
+     * ENSURE(getIdentifier() == id)
+     * ENSURE(getRoomId() == rId)
+     */
+    Meeting(const std::string& lbl,
+            const std::string& id,
+            const std::string& rId,
+            std::chrono::system_clock::time_point d);
     /**
      * @brief Controleert of het object correct is geïnitialiseerd.
      */
@@ -62,18 +73,29 @@ public:
     /**
      * @brief Voegt een deelnemer toe aan de meeting.
      */
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * REQUIRE(!userName.empty())
+     * ENSURE(getParticipants().size() == old size + 1)
+     * ENSURE(last participant == userName)
+     */
     void addParticipant(const std::string& userName, bool isExternal = false);
-
     /**
      * @brief Zet de verwerkingsstatus van de meeting.
      */
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * ENSURE(isProcessed() == status)
+     */
     void setProcessed(bool status);
-
     /**
      * @brief Zet de geannuleerde status van de meeting.
      */
+    /**
+     * REQUIRE(isProperlyInitialized())
+     * ENSURE(isCanceled() == status)
+     */
     void setCanceled(bool status);
-
 };
 
 #endif // INC_MEETING_H

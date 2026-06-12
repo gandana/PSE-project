@@ -26,7 +26,8 @@ set(CORE_SOURCES
 
 # 2. Het echte programma
 # Gebruikt main.cpp + alle core bestanden
-add_executable(MeetingPlanner src/main.cpp ${CORE_SOURCES})
+add_executable(MeetingPlanner src/main.cpp ${CORE_SOURCES}
+        src/test_main.cpp)
 
 # --- Google Test setup ---
 include(FetchContent)
@@ -44,6 +45,7 @@ add_executable(run_meeting_tests
         tests/DomainTests.cpp
         tests/ParserTests.cpp
         ${CORE_SOURCES}
+        tests/MeetingTesting.cpp
 )
 
 # Link de Google Test bibliotheek

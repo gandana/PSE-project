@@ -1,61 +1,43 @@
 #include <gtest/gtest.h>
-#include "Meeting.h"
-#include <chrono>
+#include "Room.h"
 
-class MeetingTest : public ::testing::Test {
-protected:
-    // Hulpvariabele voor een standaard datum (vandaag)
-    std::chrono::system_clock::time_point testDate = std::chrono::system_clock::now();
+class RoomTest : public ::testing::Test {
 };
 
-// 1. Test de Constructor en Getters (Happy Day)
-TEST_F(MeetingTest, ConstructorAndGetters) {
-    Meeting meeting("Project Overleg", "M001", "Room_A", testDate);
+// Happy day
+TEST_F(RoomTest, ConstructorAndGetters) {
+    Room room("Lokaal A", "R001", 30, "C001", "B001");
 
-    EXPECT_EQ(meeting.getLabel(), "Project Overleg");
-    EXPECT_EQ(meeting.getIdentifier(), "M001");
-    EXPECT_EQ(meeting.getRoomId(), "Room_A");
-    EXPECT_TRUE(meeting.isProperlyInitialized());
-    EXPECT_FALSE(meeting.isProcessed());
-    EXPECT_FALSE(meeting.isCanceled());
+    EXPECT_TRUE(room.isProperlyInitialized());
+    EXPECT_EQ(room.getName(), "Lokaal A");
+    EXPECT_EQ(room.getIdentifier(), "R001");
+    EXPECT_EQ(room.getCapacity(), 30);
+    EXPECT_EQ(room.getCampusId(), "C001");
+    EXPECT_EQ(room.getBuildingId(), "B001");
 }
 
-// 2. Test het toevoegen van deelnemers
-TEST_F(MeetingTest, AddParticipants) {
-    Meeting meeting("Overleg", "M001", "Room_A", testDate);
-
-    meeting.addParticipant("Kasper");
-    meeting.addParticipant("Denys");
-
-    EXPECT_EQ(meeting.getParticipants().size(), 2);
-    EXPECT_EQ(meeting.getParticipants()[0], "Kasper");
-    EXPECT_EQ(meeting.getParticipants()[1], "Denys");
+// Contract tests
+TEST_F(RoomTest, InvalidCapacityDies) {
+    EXPECT_DEATH(Room("Lokaal A", "R001", -5, "C001", "B001"),
+                 "Capacity must be strictly greater than 0");
 }
 
-// 3. Test de status wijzigingen
-TEST_F(MeetingTest, StatusUpdates) {
-    Meeting meeting("Overleg", "M001", "Room_A", testDate);
-
-    meeting.setProcessed(true);
-    EXPECT_TRUE(meeting.isProcessed());
-
-    meeting.setCanceled(true);
-    EXPECT_TRUE(meeting.isCanceled());
+TEST_F(RoomTest, EmptyNameDies) {
+    EXPECT_DEATH(Room("", "R001", 30, "C001", "B001"),
+                 "Name cannot be empty");
 }
 
-// 4. Test de CONTRACTEN (REQUIRE)
-// Deze testen controleren of je programma inderdaad stopt bij foute input.
-// Let op: gtest kan alleen ASSERT_DEATH gebruiken als je systeem abort() roept bij een contract_fail.
-TEST_F(MeetingTest, ContractViolations) {
-    // Test lege label in constructor (moet REQUIRE failen)
-    EXPECT_DEATH(Meeting("", "ID", "ROOM", testDate), "Label cannot be empty");
-
-    // Test lege deelnemer naam
-    Meeting meeting("Overleg", "M001", "Room_A", testDate);
-    EXPECT_DEATH(meeting.addParticipant(""), "User name cannot be empty");
+TEST_F(RoomTest, EmptyIdentifierDies) {
+    EXPECT_DEATH(Room("Lokaal A", "", 30, "C001", "B001"),
+                 "Identifier cannot be empty");
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+TEST_F(RoomTest, EmptyCampusDies) {
+    EXPECT_DEATH(Room("Lokaal A", "R001", 30, "", "B001"),
+                 "Campus ID cannot be empty");
+}
+
+TEST_F(RoomTest, EmptyBuildingDies) {
+    EXPECT_DEATH(Room("Lokaal A", "R001", 30, "C001", ""),
+                 "Building ID cannot be empty");
 }

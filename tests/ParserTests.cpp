@@ -26,8 +26,8 @@ TEST_F(ParserTest, LoadInvalidSystem) {
     // Omdat we nu REQUIRE(capacity > 0) hebben, MOET het programma crashen.
     // ASSERT_DEATH controleert of dat gebeurt.
     ASSERT_DEATH({
-        parser.loadFile(filename, planner);
-    }, "Capacity must be strictly positive");
+    parser.loadFile(filename, planner);
+}, "Capacity must be strictly greater than 0");
 }
 
 // Test 3: Proving it survives if a file completely doesn't exist
